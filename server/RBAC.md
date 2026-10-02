@@ -93,4 +93,5 @@ Phase 7 validation results:
 - BigQuery counts before/after remained three users, 750 sales, and zero
   audit logs. No cloud records, IAM, or resources were changed.
 
-Phase 7 stops here. Phase 8 is not implemented.
+Phase 7 validation above records its original completion state. Phase 8 now
+implements the guarded sales endpoints documented in [SALES_API.md](SALES_API.md).

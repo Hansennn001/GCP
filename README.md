@@ -6,10 +6,11 @@ phases will package the application with Docker and deploy it to Cloud Run.
 
 ## Current status
 
-Phase 7 — Backend RBAC is complete. The application dataset has
+Phase 8 — Sales Backend API is complete. The application dataset has
 three demo users and 750 sample sales records. The Express API provides
 BigQuery-backed bcrypt login, JWT authentication, `/api/auth/me`, a health
-endpoint, reusable role guards, and read-only permission probes.
+endpoint, reusable role guards, permission probes, and a sales API with
+transactional create/delete audit logs.
 The frontend dashboard, charts, and tables continue to use static sample
 data. All frontend pages remain accessible; login remains a placeholder.
 
@@ -23,8 +24,6 @@ scripts/      BigQuery setup SQL and instructions
 .gitignore    Local files and generated output to exclude from Git
 ```
 
-The empty `server/utils/` directory contains a `.gitkeep` file so Git can
-preserve it.
 The implementation plan is in
 [CODEX_BUILD_PLAN_SALES_INSIGHT_DASHBOARD.md](CODEX_BUILD_PLAN_SALES_INSIGHT_DASHBOARD.md).
 Work proceeds one phase at a time, with an explicit instruction required to
@@ -291,8 +290,27 @@ reusable middleware, and read-only `/api/access/<permission>` checks.
 - BigQuery counts remained three users, 750 sales, and zero audit logs; no
   cloud resources or records were changed.
 
-Phase 8 — Sales Backend API is next and has not started. Frontend authentication
-integration and business API endpoints remain for later phases.
+## Phase 8 sales API
+
+See [the sales API guide](server/SALES_API.md) for requests, responses,
+validation limits, pagination, and transactional audit behavior.
+
+- `GET /api/sales`: all three roles can list sales with bounded pagination.
+- `POST /api/sales`: Admin/Analyst can create; Viewer receives 403.
+- `DELETE /api/sales/:id`: Admin can delete; Analyst/Viewer receive 403.
+- Server-generated IDs and authenticated user identities prevent client
+  impersonation. Dates, text, quantities, monetary values, and IDs are validated.
+- Create/delete and their corresponding audit records are committed together.
+  Missing sale deletions return 404 without creating an audit record.
+- Syntax checks and all 33 backend tests passed. Live BigQuery checks verified
+  listing, role restrictions, exact monetary values, create/delete audits,
+  and rollback after an intentional transaction failure.
+- The two validation sales were deleted using the Admin API. The original
+  750 seed sales and three user records remained unchanged; four validation
+  create/delete audit records were retained. No other project resources changed.
+
+Phase 9 — Dashboard and Analytics Backend API is next and has not started.
+Frontend API integration remains for a later phase.
 
 ## Environment configuration
 
