@@ -2,13 +2,13 @@
 
 A proof-of-concept sales analytics dashboard planned with React, Express,
 JWT authentication, role-based access control, and Google BigQuery. A Docker
-image now packages the application; local container deployment and Cloud Run
-remain for later phases.
+image packages the application and has been validated locally. GCP
+preparation and Cloud Run deployment remain for later phases.
 
 ## Current status
 
-Phase 15 — Dockerfile is complete. The multi-stage production image builds
-successfully and is configured to run as a non-root user. Express serves both `/api/*` and the React production build with direct-route refresh
+Phase 16 — Local Docker Deployment is complete. The production container
+serves React and APIs with real BigQuery login and RBAC. Express serves both `/api/*` and the React production build with direct-route refresh
 support. Dashboard, Transactions, Analytics, Users, and Audit Logs load
 through Express APIs
 backed by BigQuery. The application dataset contains three demo users,
@@ -16,9 +16,10 @@ backed by BigQuery. The application dataset contains three demo users,
 page access, and actions follow the signed-in user's role. Admin/Analyst can
 create transactions; Admin can confirm deletion and update user roles.
 Loading, empty, error/retry, pagination, and mutation refresh states are available.
-Local Docker deployment and Cloud Run remain for later phases. See
-[production startup](server/PRODUCTION.md) and
-[container build and validation](server/CONTAINER_IMAGE.md).
+GCP preparation and Cloud Run remain for later phases. See
+[production startup](server/PRODUCTION.md),
+[container build](server/CONTAINER_IMAGE.md), and
+[local Docker startup and validation](scripts/docker/LOCAL_DOCKER.md).
 
 ## Repository structure
 
@@ -441,7 +442,26 @@ The local image is linux/arm64 (84.8 MB reported by Docker). Inspection used a
 stopped container that was removed; the application was not started in Docker.
 See [the image guide](server/CONTAINER_IMAGE.md) for validation details.
 
-Phase 15 stops here. Phase 16 and Cloud Run deployment have not started.
+## Phase 16 local Docker deployment
+
+The container passed real login/BigQuery checks for all three roles, direct
+navigation/refresh, dashboard/charts, transactions, Admin user management,
+audit logs, and the complete backend permission matrix. All 31 browser tests
+against the container passed, along with syntax/lint/whitespace checks.
+Data counts and full-row digests stayed unchanged: three users, 750 sales,
+13 audit logs. Validation used no successful cloud mutations.
+
+```bash
+node scripts/docker/run-local.mjs
+```
+
+Open `http://localhost:8080`. The helper mounts temporary ADC/config files
+read-only, generates a local JWT secret, and publishes only to localhost.
+Ctrl+C stops/removes its container and cleans up its temporary credentials.
+The validation container was stopped afterward; run the command to restart it.
+See [the local Docker guide](scripts/docker/LOCAL_DOCKER.md) for details.
+
+Phase 16 stops here. Phase 17 and Cloud Run deployment have not started.
 
 ## Environment configuration
 

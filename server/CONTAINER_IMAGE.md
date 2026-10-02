@@ -2,8 +2,9 @@
 
 The root Dockerfile packages the production application prepared in
 [PRODUCTION.md](PRODUCTION.md). This phase builds and inspects the image;
-local application deployment and BigQuery tests inside the container belong
-to Phase 16. Cloud Run deployment has not started.
+local application deployment and BigQuery validation are now documented in
+[LOCAL_DOCKER.md](../scripts/docker/LOCAL_DOCKER.md). Cloud Run deployment has
+not started.
 
 ## Build
 
@@ -95,4 +96,7 @@ No application container was started, no BigQuery requests were made, and no
 cloud data, IAM, or other project resources were changed. Runtime connectivity,
 login, and RBAC inside Docker are intentionally reserved for Phase 16.
 
-Phase 15 stops here. Phase 16 and Cloud Run deployment have not started.
+The results above record Phase 15 image validation. Completed Phase 16
+runtime checks and startup instructions are in
+[LOCAL_DOCKER.md](../scripts/docker/LOCAL_DOCKER.md). GCP preparation and Cloud
+Run deployment have not started.
