@@ -15,6 +15,9 @@ async function main() {
   if (!JSON.parse(adc).type) throw new Error('ADC credential type missing')
   const directory = await mkdtemp(join(tmpdir(), 'sales-insight-docker-'))
   await chmod(directory, 0o700)
+  const image = process.env.LOCAL_DOCKER_IMAGE || 'sales-insight-dashboard:latest'
+  const platform = process.env.LOCAL_DOCKER_PLATFORM
+  if (platform && !['linux/amd64', 'linux/arm64'].includes(platform)) throw new Error('Unsupported local platform')
   const name = `sales-insight-local-${randomUUID()}`
   const stop = () => {
     try { execFileSync('docker', ['stop', '--time', '10', name], { stdio: 'ignore', timeout: 15000 }) } catch { /* Already stopped or startup failed. */ }
@@ -36,11 +39,12 @@ async function main() {
     console.log(`Starting local container at http://127.0.0.1:${port}; Ctrl+C stops it and removes temporary credentials.`)
     const child = spawn('docker', [
       'run', '--rm', '--init', '--name', name,
+      ...(platform ? ['--platform', platform] : []),
       '--publish', `127.0.0.1:${port}:8080`,
       '--mount', `type=bind,source=${runtimeConfig},target=/app/.env,readonly`,
       '--mount', `type=bind,source=${adcCopy},target=/run/local-adc.json,readonly`,
       '--env', 'GOOGLE_APPLICATION_CREDENTIALS=/run/local-adc.json',
-      'sales-insight-dashboard:latest',
+      image,
     ], { stdio: 'inherit' })
     process.on('SIGINT', stop)
     process.on('SIGTERM', stop)
