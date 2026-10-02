@@ -6,9 +6,10 @@ phases will package the application with Docker and deploy it to Cloud Run.
 
 ## Current status
 
-Phase 5 — BigQuery Seed Data is complete. The application dataset now has
-three demo users and 750 sample sales records. An independent
-Express API provides a health endpoint and predictable JSON error responses.
+Phase 6 — Backend Authentication is complete. The application dataset has
+three demo users and 750 sample sales records. The Express API provides
+BigQuery-backed bcrypt login, JWT authentication, `/api/auth/me`, a health
+endpoint, and predictable JSON error responses.
 The frontend dashboard, charts, and tables continue to use static sample
 data. All frontend pages remain accessible; login remains a placeholder.
 
@@ -257,8 +258,24 @@ Keychain password retrieval, safe reruns, and validation details.
 - Syntax checks, all 12 backend tests, the BigQuery connection check, and
   the live health endpoint passed.
 
-Phase 6 — Backend Authentication is next and has not started. Application
-authentication, RBAC, and business API endpoints have not been implemented.
+## Phase 6 authentication and validation
+
+See [the backend authentication guide](server/AUTHENTICATION.md) for local
+secret setup, API contracts, and validation details.
+
+- Added `POST /api/auth/login` and authenticated `GET /api/auth/me`.
+- Login uses parameterized BigQuery queries, checks active status, verifies
+  bcrypt passwords, and issues one-hour HS256 JWTs with safe user data.
+- Authentication rejects invalid tokens; `/me` checks the current user's
+  active status in BigQuery. Password hashes and secrets are never returned.
+- Syntax checks and all 19 backend tests passed. Live login and `/me` checks
+  passed for all three demo roles. Invalid credentials and missing tokens
+  returned 401, and health returned 200.
+- BigQuery counts remained three users, 750 sales, and zero audit logs;
+  authentication did not modify cloud resources.
+
+Phase 7 — Backend RBAC is next and has not started. Frontend authentication
+integration and business API endpoints remain for later phases.
 
 ## Environment configuration
 
@@ -270,7 +287,8 @@ take precedence over `.env` values.
 `PORT` defaults to 8080 and must be an integer from 1 to 65535. BigQuery
 uses `GOOGLE_CLOUD_PROJECT`, `BIGQUERY_DATASET` (default `sales_dashboard`),
 and `BIGQUERY_LOCATION` (default `asia-southeast2`, which must match the
-dataset location). `JWT_SECRET` is a placeholder for a later phase.
+dataset location). `JWT_SECRET` must be a random secret of at least 32 bytes
+for token issuance and verification; the example value must be replaced.
 The health endpoint does not require BigQuery configuration or credentials.
 
 Keep real secrets, passwords, and Google Cloud credentials out of the
