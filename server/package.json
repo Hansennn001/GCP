@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "node --watch index.js",
     "start": "node index.js",
+    "test": "node --test",
     "check": "node --check app.js && node --check index.js && node --check config/env.js && node --check controllers/healthController.js && node --check routes/healthRoutes.js && node --check middleware/notFound.js && node --check middleware/errorHandler.js"
   },
   "dependencies": {
