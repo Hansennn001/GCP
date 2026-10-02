@@ -13,11 +13,11 @@ async function main() {
     : join(process.env.CLOUDSDK_CONFIG || join(homedir(), '.config/gcloud'), 'application_default_credentials.json')
   const adc = await readFile(adcSource)
   if (!JSON.parse(adc).type) throw new Error('ADC credential type missing')
-  const directory = await mkdtemp(join(tmpdir(), 'sales-insight-docker-'))
-  await chmod(directory, 0o700)
   const image = process.env.LOCAL_DOCKER_IMAGE || 'sales-insight-dashboard:latest'
   const platform = process.env.LOCAL_DOCKER_PLATFORM
   if (platform && !['linux/amd64', 'linux/arm64'].includes(platform)) throw new Error('Unsupported local platform')
+  const directory = await mkdtemp(join(tmpdir(), 'sales-insight-docker-'))
+  await chmod(directory, 0o700)
   const name = `sales-insight-local-${randomUUID()}`
   const stop = () => {
     try { execFileSync('docker', ['stop', '--time', '10', name], { stdio: 'ignore', timeout: 15000 }) } catch { /* Already stopped or startup failed. */ }
