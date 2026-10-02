@@ -165,7 +165,10 @@ custom IAM role, secret, image push, or Cloud Run deployment was changed/created
 by this phase. The only cloud mutations were enabling the three required APIs
 and creating the dedicated repository. These results record Phase 17. The tested amd64 image is now published as
 documented in [IMAGE_PUBLICATION.md](IMAGE_PUBLICATION.md); Phase 19 deployment
-has not started.
+is now in progress. The dedicated runtime service account and JWT secret were
+created, but IAM setup and deployment are blocked on administrator permissions.
+See [the Phase 19 handoff](PHASE19_IAM_SETUP.md) for the current status and
+remaining commands. The historical Phase 17 results above remain unchanged.
 
 Primary references:
 

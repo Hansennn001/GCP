@@ -3,12 +3,16 @@
 A proof-of-concept sales analytics dashboard planned with React, Express,
 JWT authentication, role-based access control, and Google BigQuery. A Docker
 image packages the application and has been validated locally. GCP
-preparation and image publication are complete; Cloud Run deployment remains
-for a later phase.
+preparation and image publication are complete; private Cloud Run deployment
+is awaiting administrator IAM setup.
 
 ## Current status
 
-Phase 18 — Build and Push Container Image is complete. The tested linux/amd64
+Phase 18 — Build and Push Container Image is complete. Phase 19 is in progress
+and blocked on administrator IAM permissions. The dedicated runtime service
+account and JWT secret exist; Cloud Run has not been deployed. See the
+[administrator handoff](scripts/gcp/PHASE19_IAM_SETUP.md).
+The tested linux/amd64
 image is published in the dedicated Artifact Registry repository. A
 least-privilege runtime IAM strategy is documented. The production container
 serves React and APIs with real BigQuery login and RBAC. Express serves both `/api/*` and the React production build with direct-route refresh
@@ -19,7 +23,7 @@ backed by BigQuery. The application dataset contains three demo users,
 page access, and actions follow the signed-in user's role. Admin/Analyst can
 create transactions; Admin can confirm deletion and update user roles.
 Loading, empty, error/retry, pagination, and mutation refresh states are available.
-Cloud Run deployment remains for a later phase. See
+Private Cloud Run deployment awaits the IAM setup described above. See
 [production startup](server/PRODUCTION.md),
 [container build](server/CONTAINER_IMAGE.md), and
 [local Docker startup and validation](scripts/docker/LOCAL_DOCKER.md), and
@@ -507,7 +511,24 @@ and [release metadata](scripts/gcp/image-release.json). Runtime identity/IAM and
 JWT-secret setup remain required before deployment. Validation containers and
 temporary credentials were cleaned up.
 
-Phase 18 stops here. Phase 19 has not started; Cloud Run is not deployed.
+Phase 18 is complete. Phase 19 preparation is recorded below; Cloud Run is not deployed.
+
+## Phase 19 private deployment preparation
+
+Created the dedicated `sales-insight-runtime` service account and
+`sales-insight-jwt` secret with enabled version `1`. No secret value was saved
+in the repository or printed. The selected Cloud Run access is private.
+
+Custom-role creation failed because the current account lacks `iam.roles.create`.
+Permission checks also found project, secret, and Cloud Run IAM-policy writes
+unavailable. No runtime IAM binding or Cloud Run deployment was applied.
+Existing table data, schemas, dataset ACLs, and workloads were not changed.
+
+The [administrator handoff and prepared deployment command](scripts/gcp/PHASE19_IAM_SETUP.md)
+scope runtime permissions to query-job submission, the three application tables,
+and the dedicated JWT secret. Administrator setup must finish before deployment
+and live Cloud Run validation. Phase 19 acceptance criteria remain pending;
+Phase 20 has not started.
 
 ## Environment configuration
 
