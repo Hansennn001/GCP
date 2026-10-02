@@ -84,7 +84,8 @@ test('invalid input and pagination fail before mutations or reads', async () => 
   for (const body of [null, [], {}, { ...saleInput, sale_date: '2026-02-30' }, { ...saleInput, sale_date: '0000-01-01' },
     { ...saleInput, quantity: 0 }, { ...saleInput, quantity: 1.5 }, { ...saleInput, quantity: Number.MAX_SAFE_INTEGER + 1 },
     { ...saleInput, revenue: '-1' }, { ...saleInput, cost: '1e3' }, { ...saleInput, revenue: '1.1234567890' },
-    { ...saleInput, revenue: '1'.repeat(30) }, { ...saleInput, product: '  ' }, { ...saleInput, region: 'x'.repeat(151) },
+    { ...saleInput, revenue: '1'.repeat(30) }, { ...saleInput, revenue: Number.MAX_SAFE_INTEGER + 1 },
+    { ...saleInput, product: '  ' }, { ...saleInput, region: 'x'.repeat(151) },
     { ...saleInput, created_by: 'admin' }, { ...saleInput, sale_id: 'forged' }]) {
     assert.equal((await request('admin', 'POST', '', body)).status, 400)
   }

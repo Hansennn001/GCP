@@ -22,6 +22,9 @@ export function validateSale(body) {
   sale.quantity = body.quantity
   for (const key of ['revenue', 'cost']) {
     if (!['number', 'string'].includes(typeof body[key])) invalid('Invalid amount')
+    if (typeof body[key] === 'number' && (!Number.isFinite(body[key]) || body[key] > Number.MAX_SAFE_INTEGER)) {
+      invalid('Use decimal strings for large amounts')
+    }
     const value = String(body[key])
     // NUMERIC allows 29 integer digits and 9 fractional digits; preserve decimal strings.
     if (!/^(0|[1-9]\d{0,28})(\.\d{1,9})?$/.test(value)) invalid('Invalid amount')
