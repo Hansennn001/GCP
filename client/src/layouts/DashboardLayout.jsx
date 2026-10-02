@@ -50,7 +50,7 @@ export default function DashboardLayout() {
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <span className="hidden text-sm text-slate-600 sm:block">{user.name}</span>
             <span aria-label="Current role"><RoleBadge role={user.role} /></span>
-            <span className="hidden rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 md:block">Sample data</span>
+            <span className="hidden rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 md:block">Live data</span>
             <Button variant="outline" onClick={logout} className="h-10"><LogOut aria-hidden="true" />Sign out</Button>
           </div>
         </header>

@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import EmptyState from '@/components/EmptyState'
 import Panel from '@/components/Panel'
 import { formatCurrency } from '@/lib/format'
 
@@ -8,6 +9,8 @@ export default function SalesChartContent({ title, description, data, trend = fa
   const axis = { axisLine: false, tickLine: false, tick: { fill: '#64748b', fontSize: 11 } }
   const moneyTick = (value) => `${value / 1000000}M`
   const tooltip = <Tooltip formatter={(value) => [formatCurrency(value), 'Revenue']} contentStyle={{ borderRadius: 12, borderColor: '#e2e8f0', fontSize: 12 }} cursor={trend ? { stroke: '#cbd5e1' } : { fill: '#f1f5f9' }} />
+
+  if (!data.length) return <Panel title={title} description={description}><EmptyState title="No sales data" description="Charts appear after sales are recorded." /></Panel>
 
   return (
     <Panel title={title} description={description}>

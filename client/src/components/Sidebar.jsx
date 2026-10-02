@@ -25,7 +25,7 @@ export default function Sidebar({ open, onNavigate }) {
         <span className="flex size-8 items-center justify-center rounded-lg bg-slate-800 text-xs font-semibold text-slate-200">SI</span>
         <div>
           <p className="text-sm font-medium text-slate-100">Sales workspace</p>
-          <p className="text-xs text-slate-400">Dashboard preview</p>
+          <p className="text-xs text-slate-400">Sales and team activity</p>
         </div>
       </div>
       <nav aria-label="Main navigation" className="flex-1 space-y-1 px-4 py-7">
@@ -45,7 +45,7 @@ export default function Sidebar({ open, onNavigate }) {
       <div className="m-4 rounded-xl border border-slate-800 p-4">
         <ArrowUpRight aria-hidden="true" className="mb-3 size-5 text-emerald-300" />
         <p className="text-sm font-medium text-slate-100">Room for better insights</p>
-        <p className="mt-1 text-xs leading-5 text-slate-400">Your future home for sales, trends, and team activity.</p>
+        <p className="mt-1 text-xs leading-5 text-slate-400">Sales, trends, and team activity in one workspace.</p>
       </div>
       <p className="px-6 pb-5 text-[11px] text-slate-500">Sales Insight Dashboard</p>
     </aside>
