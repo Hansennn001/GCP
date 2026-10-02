@@ -2,11 +2,11 @@
 
 Target project: `id-fpoc-0608-data-posindo`.
 Dataset: `sales_dashboard`.
-Proposed location for this new dataset: Jakarta (`asia-southeast2`).
+Location: Jakarta (`asia-southeast2`).
 
 The four SQL files create an empty dataset and the planned tables. They use
-`IF NOT EXISTS`, so rerunning them does not replace existing resources or
-delete data. They do not migrate an existing schema or change its location.
+strict `CREATE` statements: setup fails if a resource already exists. They
+do not reuse, replace, migrate, or delete existing resources.
 No users, passwords, sales records, or audit events are inserted in Phase 4.
 
 ## 1. Install and authenticate
@@ -55,7 +55,13 @@ Confirm Jakarta is the desired location before executing. For another
 location, change `create_dataset.sql`, `BIGQUERY_LOCATION` in the local
 environment file, and the `--location` values below together.
 
-Run from the repository root, in this order:
+The Phase 4 resources have already been created; do not rerun these commands
+for the current setup. For a future fresh setup, first check that the target
+dataset does not exist. If it exists, stop and choose a new dataset name,
+updating all SQL paths and the environment configuration together.
+
+Run from the repository root, in this order, only for a confirmed new dataset.
+Stop immediately if any command fails; do not continue with the table SQL:
 
 ```bash
 bq --project_id=id-fpoc-0608-data-posindo --location=asia-southeast2 query --use_legacy_sql=false < scripts/bigquery/create_dataset.sql
@@ -71,9 +77,9 @@ bq show id-fpoc-0608-data-posindo:sales_dashboard
 bq ls id-fpoc-0608-data-posindo:sales_dashboard
 ```
 
-If the dataset already exists elsewhere, use its actual location. An
-existing table is preserved by these scripts, so inspect its schema rather
-than assuming `IF NOT EXISTS` validates or updates it.
+Never use an existing dataset for this fresh setup. The SQL targets only
+the explicitly named project and dataset. There are no `OR REPLACE`,
+`ALTER`, `DROP`, or data mutation statements.
 
 ## 4. Verify the backend connection
 
@@ -105,12 +111,22 @@ added to the unauthenticated API.
 
 ## Validation status
 
-Local syntax checks and all ten backend tests passed. The health endpoint
-still returns HTTP 200 without cloud credentials. The live BigQuery query
-failed because this machine has no ADC login yet. No cloud dataset or
-tables have been created, and the SQL has not been validated by BigQuery.
-Phase 4 remains pending authentication, resource creation, and successful
-live query execution. Phase 5 has not started.
+Phase 4 completed on 2 October 2026:
+
+- ADC successfully executed a parameterized GoogleSQL query.
+- A read-only existence check confirmed `sales_dashboard` was absent before
+  executing the strict creation SQL.
+- All four SQL statements executed successfully in the target project.
+- Dataset location is `asia-southeast2`.
+- Exactly three tables exist: `users` (7 columns), `sales` (10 columns), and
+  `audit_logs` (6 columns). Column names and types match the plan.
+- Every table contains zero rows; no seed data was inserted.
+- `npm run check`, all ten backend tests, and `npm run check:bigquery` passed.
+- The running Express health endpoint returned HTTP 200 and the expected
+  service JSON.
+- No existing datasets/tables, IAM, or project settings were modified.
+
+No credentials were added to the repository. Phase 5 has not started.
 
 References: [CLI installation](https://docs.cloud.google.com/sdk/docs/install-sdk),
 [local ADC](https://docs.cloud.google.com/docs/authentication/set-up-adc-local-dev-environment),

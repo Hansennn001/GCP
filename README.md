@@ -6,8 +6,8 @@ phases will package the application with Docker and deploy it to Cloud Run.
 
 ## Current status
 
-Phase 4 — BigQuery Setup Scripts and Connection has its code and SQL ready;
-live validation is pending Google Cloud authentication. An independent
+Phase 4 — BigQuery Setup Scripts and Connection is complete. A new dataset
+and three empty tables were created and validated in BigQuery. An independent
 Express API provides a health endpoint and predictable JSON error responses.
 The frontend dashboard, charts, and tables continue to use static sample
 data. All frontend pages remain accessible; login remains a placeholder.
@@ -221,18 +221,24 @@ login, permissions, dataset/table creation, and connection validation.
 - Installed `@google-cloud/bigquery` and the local Google Cloud CLI.
 - Added SQL for `sales_dashboard.users`, `sales_dashboard.sales`, and
   `sales_dashboard.audit_logs`, plus dataset creation SQL.
-- Configured the target project `id-fpoc-0608-data-posindo` and proposed
+- Configured the target project `id-fpoc-0608-data-posindo` and
   Jakarta location (`asia-southeast2`). A local ignored `.env` contains
   only non-secret configuration.
-- Local syntax checks and all ten backend tests passed; health still works
-  without ADC. Service tests use an offline client double and do not prove
-  a live BigQuery connection.
-- The live `npm run check:bigquery` attempt failed without ADC credentials.
-  Dataset/table creation and SQL validation in BigQuery remain pending.
+- On 2 October 2026, confirmed `sales_dashboard` did not exist, then created
+  it in Jakarta with empty `users`, `sales`, and `audit_logs` tables. Only
+  these new resources were targeted; no existing datasets, tables, IAM, or
+  project settings were modified.
+- SQL uses strict `CREATE` statements: existing resources cause an error
+  rather than being reused or replaced. Do not rerun setup against an
+  existing dataset.
+- All three table schemas match the build plan and contain zero rows.
+- Local syntax checks and all ten backend tests passed. The live
+  `npm run check:bigquery` succeeded using ADC, and the running Express
+  health endpoint returned HTTP 200 with the expected service JSON.
 
-Phase 4 is not yet complete. Finish Google login and live setup/validation
-before proceeding to Phase 5. Authentication, RBAC, business API endpoints,
-and data seeding have not been implemented.
+Phase 5 — BigQuery Seed Data is the next phase and has not started.
+Application authentication, RBAC, business API endpoints, and data seeding
+have not been implemented.
 
 ## Environment configuration
 
