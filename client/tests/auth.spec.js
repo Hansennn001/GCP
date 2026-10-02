@@ -81,7 +81,7 @@ test('API 401 after login clears the session and redirects', async ({ page }) =>
   expect(await page.evaluate(key => sessionStorage.getItem(key), key)).toBeNull()
 })
 
-test('login remains usable on narrow screens and authenticated pages retain Phase 11 navigation', async ({ page }) => {
+test('login and permitted navigation remain usable on narrow screens', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await successfulApi(page)
   await page.goto('/login')
@@ -90,9 +90,9 @@ test('login remains usable on narrow screens and authenticated pages retain Phas
   await signIn(page)
   await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible()
   await page.getByRole('button', { name: 'Open navigation' }).click()
-  await page.getByRole('link', { name: 'Users', exact: true }).click()
-  await expect(page).toHaveURL(/\/users$/)
-  // Frontend role gating begins in Phase 12; this phase protects authentication only.
+  await expect(page.getByRole('link', { name: 'Users', exact: true })).toHaveCount(0)
+  await page.getByRole('link', { name: 'Transactions', exact: true }).click()
+  await expect(page).toHaveURL(/\/transactions$/)
 })
 
 test('login network failures display a safe error and permit another attempt', async ({ page }) => {
