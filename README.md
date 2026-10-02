@@ -6,14 +6,15 @@ phases will package the application with Docker and deploy it to Cloud Run.
 
 ## Current status
 
-Phase 10 — User Management and Audit API is complete. The application dataset has
+Phase 11 — Frontend Authentication Integration is complete. The application dataset has
 three demo users and 750 sample sales records. The Express API provides
 BigQuery-backed bcrypt login, JWT authentication, `/api/auth/me`, a health
 endpoint, reusable role guards, permission probes, and a sales API with
 transactional create/delete audit logs, plus BigQuery dashboard and analytics
 aggregations, Admin user management, and audit-log listing.
 The frontend dashboard, charts, and tables continue to use static sample
-data. All frontend pages remain accessible; login remains a placeholder.
+data. Login now communicates with Express, validates the session, and protects
+workspace routes. Frontend role-based page restrictions begin in Phase 12.
 
 ## Repository structure
 
@@ -44,7 +45,9 @@ npm run dev
 ```
 
 Open the local URL printed by Vite (normally `http://localhost:5173`).
-The root URL redirects to `/dashboard`.
+The root URL redirects to `/dashboard`. Anonymous workspace visits redirect
+to `/login`. Start the Express backend on port 8080 to sign in; Vite proxies
+`/api` requests to it. See [frontend authentication setup](client/AUTHENTICATION.md).
 
 Available routes:
 
@@ -345,8 +348,25 @@ role updates, audit details, and validation instructions.
   and prior audits remained unchanged. Final counts: three users, 750 sales,
   seven audit logs; three role validation audits were retained.
 
-Phase 11 — Frontend Authentication Integration is next and has not started.
-The frontend still uses static sample data and a placeholder login.
+## Phase 11 frontend authentication
+
+See [the frontend authentication guide](client/AUTHENTICATION.md) for startup,
+session behavior, and browser validation.
+
+- Added a responsive login form, `AuthContext`, API layer, protected routes,
+  signed-in user display, and logout.
+- JWTs are stored in tab-scoped sessionStorage. Login and reload validate
+  the session through `/api/auth/me`; authenticated 401 responses clear it.
+- Temporary session verification errors permit retry without displaying
+  protected content. Login restores the requested workspace destination.
+- ESLint, production build, and all seven Chromium browser tests passed.
+  Live browser checks passed for all three demo accounts through the real
+  Vite proxy, Express, and BigQuery, including reload and logout.
+- BigQuery counts/digests remained unchanged: three users, 750 sales,
+  seven audit logs. No business APIs were called by the frontend.
+
+Phase 12 — Frontend RBAC is next and has not started. Workspace business
+content still uses static sample data.
 
 ## Environment configuration
 
