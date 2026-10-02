@@ -38,7 +38,8 @@ INSERT INTO `id-fpoc-0608-data-posindo.sales_dashboard.users`
   (user_id, name, email, password_hash, role, status, created_at)
 SELECT user_id, name, email, password_hash, role, status, created_at
 FROM seed_users seed
-WHERE NOT EXISTS (SELECT 1 FROM `id-fpoc-0608-data-posindo.sales_dashboard.users` existing WHERE existing.user_id = seed.user_id OR existing.email = seed.email);
+WHERE NOT EXISTS (SELECT 1 FROM `id-fpoc-0608-data-posindo.sales_dashboard.users` existing WHERE existing.user_id = seed.user_id)
+  AND NOT EXISTS (SELECT 1 FROM `id-fpoc-0608-data-posindo.sales_dashboard.users` existing WHERE existing.email = seed.email);
 
 INSERT INTO `id-fpoc-0608-data-posindo.sales_dashboard.sales`
   (sale_id, sale_date, product, category, region, quantity, revenue, cost, created_by, created_at)
