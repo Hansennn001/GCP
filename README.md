@@ -6,11 +6,12 @@ phases will package the application with Docker and deploy it to Cloud Run.
 
 ## Current status
 
-Phase 8 — Sales Backend API is complete. The application dataset has
+Phase 9 — Dashboard and Analytics Backend API is complete. The application dataset has
 three demo users and 750 sample sales records. The Express API provides
 BigQuery-backed bcrypt login, JWT authentication, `/api/auth/me`, a health
 endpoint, reusable role guards, permission probes, and a sales API with
-transactional create/delete audit logs.
+transactional create/delete audit logs, plus BigQuery dashboard and analytics
+aggregations.
 The frontend dashboard, charts, and tables continue to use static sample
 data. All frontend pages remain accessible; login remains a placeholder.
 
@@ -309,7 +310,25 @@ validation limits, pagination, and transactional audit behavior.
   750 seed sales and three user records remained unchanged; four validation
   create/delete audit records were retained. No other project resources changed.
 
-Phase 9 — Dashboard and Analytics Backend API is next and has not started.
+## Phase 9 dashboard and analytics API
+
+See [the reporting API guide](server/REPORTING_API.md) for response contracts,
+metric definitions, ordering, empty-table behavior, and numeric precision.
+
+- Added dashboard summary and monthly revenue trend endpoints.
+- Added product, region, and top-five-product aggregation endpoints.
+- All three active roles can read reports. Calculations run in BigQuery;
+  the backend returns chart-friendly aggregate data.
+- Reports only read the application dataset and do not create audit logs.
+- Syntax checks and all 39 backend tests passed. `npm --prefix server run
+  check:reporting` validated all five endpoints across the three demo roles,
+  seed aggregate totals, empty sources, revenue ties, and exact NUMERIC ranking.
+- Summary returned revenue 32,052,442,000 from 750 orders, with
+  `App Modernization` as the top product.
+- All table counts and row digests were unchanged: three users, 750 sales,
+  four audit logs. Other project resources were not modified.
+
+Phase 10 — User Management and Audit API is next and has not started.
 Frontend API integration remains for a later phase.
 
 ## Environment configuration
