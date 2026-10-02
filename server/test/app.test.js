@@ -3,7 +3,8 @@ import { once } from 'node:events'
 import { after, before, test } from 'node:test'
 import { spawnSync } from 'node:child_process'
 import express from 'express'
-import app from '../app.js'
+import { createApp } from '../app.js'
+const app = createApp(undefined, { frontendDir: null, corsOrigins: ['http://localhost:5173'] })
 import errorHandler from '../middleware/errorHandler.js'
 
 let server
@@ -59,7 +60,7 @@ test('CORS responds to a local development preflight', async () => {
     method: 'OPTIONS', headers: { Origin: 'http://localhost:5173', 'Access-Control-Request-Method': 'GET' },
   })
   assert.equal(response.status, 204)
-  assert.equal(response.headers.get('access-control-allow-origin'), '*')
+  assert.equal(response.headers.get('access-control-allow-origin'), 'http://localhost:5173')
   assert.match(response.headers.get('access-control-allow-methods'), /GET/)
 })
 

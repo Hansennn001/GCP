@@ -7,7 +7,7 @@ export class ApiError extends Error {
   }
 }
 
-// Relative URLs use Vite's development proxy and the eventual same-origin deployment.
+// Relative URLs use Vite's development proxy and Express same-origin production serving.
 export async function apiRequest(path, { method = 'GET', body, token = readToken(), signal } = {}) {
   const controller = new AbortController()
   const abort = () => controller.abort()
