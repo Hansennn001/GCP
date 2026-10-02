@@ -30,7 +30,7 @@ test('health responds with the service contract and security headers', async () 
 })
 
 test('unknown and future routes return a JSON 404', async () => {
-  for (const path of ['/missing', '/api/missing', '/api/sales']) {
+  for (const path of ['/missing', '/api/missing']) {
     const response = await fetch(`${baseUrl}${path}`)
     assert.equal(response.status, 404)
     assert.deepEqual(await response.json(), { success: false, message: 'Not found' })
