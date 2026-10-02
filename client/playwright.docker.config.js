@@ -1,3 +1,4 @@
+import process from 'node:process'
 import { defineConfig } from '@playwright/test'
 import config from './playwright.config.js'
 
