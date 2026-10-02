@@ -51,10 +51,10 @@ password into the login form; passwords are never stored by this application.
   after logout, and an old token's 401 cannot clear a newer stored token.
 
 `sessionStorage` is the simple PoC storage choice. The sidebar does not link
-back to the public login screen once signed in. Frontend role-based navigation
-and action guards begin in Phase 12. In Phase 11, all authenticated roles can
-still view the static workspace pages; backend business permissions remain
-enforced by the existing server RBAC.
+back to the public login screen once signed in. Phase 12 now applies
+role-based navigation, page guards, and preview action visibility as described
+in [RBAC.md](RBAC.md). Backend business permissions remain enforced by the
+existing server RBAC.
 
 Dashboard, analytics, users, audit logs, and transactions still use sample
 data. This phase only calls the login and current-user APIs. Serving the React
@@ -103,5 +103,6 @@ Results:
   three users, 750 sales, seven audit logs. No cloud resources were modified.
 - Local servers started for validation were stopped afterward.
 
-Phase 11 stops here. Phase 12 and business-data frontend integration have not
-started.
+The results above record Phase 11 validation. The current expanded browser
+suite and Phase 12 permissions are documented in [RBAC.md](RBAC.md).
+Business-data frontend integration remains for Phase 13.

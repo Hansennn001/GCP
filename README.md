@@ -6,7 +6,7 @@ phases will package the application with Docker and deploy it to Cloud Run.
 
 ## Current status
 
-Phase 11 — Frontend Authentication Integration is complete. The application dataset has
+Phase 12 — Frontend RBAC is complete. The application dataset has
 three demo users and 750 sample sales records. The Express API provides
 BigQuery-backed bcrypt login, JWT authentication, `/api/auth/me`, a health
 endpoint, reusable role guards, permission probes, and a sales API with
@@ -14,7 +14,8 @@ transactional create/delete audit logs, plus BigQuery dashboard and analytics
 aggregations, Admin user management, and audit-log listing.
 The frontend dashboard, charts, and tables continue to use static sample
 data. Login now communicates with Express, validates the session, and protects
-workspace routes. Frontend role-based page restrictions begin in Phase 12.
+workspace routes. Navigation, page access, and preview actions now follow
+the signed-in user's role.
 
 ## Repository structure
 
@@ -365,8 +366,23 @@ session behavior, and browser validation.
 - BigQuery counts/digests remained unchanged: three users, 750 sales,
   seven audit logs. No business APIs were called by the frontend.
 
-Phase 12 — Frontend RBAC is next and has not started. Workspace business
-content still uses static sample data.
+## Phase 12 frontend permissions
+
+See [the frontend RBAC guide](client/RBAC.md) for the role matrix,
+route guards, action visibility, and validation.
+
+- Added `hasRole()`/`can()` helpers, filtered navigation, permission guards
+  for direct routes, and a current-role badge that remains visible on mobile.
+- Only Admin sees Users/Audit Logs pages. Admin/Analyst see Create transaction;
+  only Admin sees Delete actions. Sample-data controls remain disabled.
+- ESLint, production build, and all 20 browser tests passed. Live checks with
+  all three demo accounts matched UI permissions and backend guards.
+- Counts and full-row digests remained unchanged: three users, 750 sales,
+  seven audit logs. No frontend business API calls were introduced.
+
+Phase 13 — Replace Mock Data with Real API Data is next and has not started.
+Workspace content still uses static sample data; forms and API mutations
+remain for Phase 13.
 
 ## Environment configuration
 
