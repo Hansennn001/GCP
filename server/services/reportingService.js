@@ -30,16 +30,16 @@ export function createReportingService(queryService) {
         FROM ${salesTable()} GROUP BY month ORDER BY month ASC`)
     },
     async products() {
-      return query(`SELECT product, ${metrics} FROM ${salesTable()}
-        GROUP BY product ORDER BY revenue DESC, product ASC`)
+      return query(`SELECT product, ${metrics} FROM ${salesTable()} AS s
+        GROUP BY product ORDER BY SUM(s.revenue) DESC, product ASC`)
     },
     async regions() {
-      return query(`SELECT region, ${metrics} FROM ${salesTable()}
-        GROUP BY region ORDER BY revenue DESC, region ASC`)
+      return query(`SELECT region, ${metrics} FROM ${salesTable()} AS s
+        GROUP BY region ORDER BY SUM(s.revenue) DESC, region ASC`)
     },
     async topProducts() {
-      return query(`SELECT product, ${metrics} FROM ${salesTable()}
-        GROUP BY product ORDER BY revenue DESC, product ASC LIMIT 5`)
+      return query(`SELECT product, ${metrics} FROM ${salesTable()} AS s
+        GROUP BY product ORDER BY SUM(s.revenue) DESC, product ASC LIMIT 5`)
     },
   }
 }
