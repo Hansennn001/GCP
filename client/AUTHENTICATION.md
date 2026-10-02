@@ -52,13 +52,14 @@ password into the login form; passwords are never stored by this application.
 
 `sessionStorage` is the simple PoC storage choice. The sidebar does not link
 back to the public login screen once signed in. Phase 12 now applies
-role-based navigation, page guards, and preview action visibility as described
+role-based navigation, page guards, and action visibility as described
 in [RBAC.md](RBAC.md). Backend business permissions remain enforced by the
 existing server RBAC.
 
-Dashboard, analytics, users, audit logs, and transactions still use sample
-data. This phase only calls the login and current-user APIs. Serving the React
-production build from Express, Docker, and Cloud Run remain for later phases.
+Dashboard, analytics, users, audit logs, and transactions now call protected
+business APIs as documented in [WORKSPACE_API.md](WORKSPACE_API.md). Serving
+the React production build from Express, Docker, and Cloud Run remain for
+later phases.
 
 ## Validation
 
@@ -105,4 +106,5 @@ Results:
 
 The results above record Phase 11 validation. The current expanded browser
 suite and Phase 12 permissions are documented in [RBAC.md](RBAC.md).
-Business-data frontend integration remains for Phase 13.
+Phase 13 business-data integration and current validation results are documented
+in [WORKSPACE_API.md](WORKSPACE_API.md).

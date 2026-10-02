@@ -6,16 +6,14 @@ phases will package the application with Docker and deploy it to Cloud Run.
 
 ## Current status
 
-Phase 12 — Frontend RBAC is complete. The application dataset has
-three demo users and 750 sample sales records. The Express API provides
-BigQuery-backed bcrypt login, JWT authentication, `/api/auth/me`, a health
-endpoint, reusable role guards, permission probes, and a sales API with
-transactional create/delete audit logs, plus BigQuery dashboard and analytics
-aggregations, Admin user management, and audit-log listing.
-The frontend dashboard, charts, and tables continue to use static sample
-data. Login now communicates with Express, validates the session, and protects
-workspace routes. Navigation, page access, and preview actions now follow
-the signed-in user's role.
+Phase 13 — Replace Mock Data with Real API Data is complete. Dashboard,
+Transactions, Analytics, Users, and Audit Logs load through Express APIs
+backed by BigQuery. The application dataset contains three demo users,
+750 sales records, and 13 audit logs after validation. Login, session checks,
+page access, and actions follow the signed-in user's role. Admin/Analyst can
+create transactions; Admin can confirm deletion and update user roles.
+Loading, empty, error/retry, pagination, and mutation refresh states are available.
+Production serving, Docker, and Cloud Run remain for later phases.
 
 ## Repository structure
 
@@ -141,9 +139,9 @@ Helmet sets security headers, and the Express identification header is
 disabled. CORS currently permits all origins for this foundation phase;
 deployment configuration will be reviewed in the planned production phase.
 
-The API currently provides only `/api/health`. The frontend still runs
-through Vite independently and does not call the API. Production static
-frontend serving belongs to Phase 14.
+The frontend runs through Vite and proxies `/api` requests to Express.
+The API includes authentication, sales, dashboard, analytics, user management,
+and audit-log endpoints. Production static frontend serving belongs to Phase 14.
 
 ## Frontend foundation
 
@@ -157,14 +155,18 @@ font. Both Vite and the editor resolve `@/` imports to `client/src/`.
 - `src/layouts/DashboardLayout.jsx`: shared header and responsive layout.
 - `src/components/Sidebar.jsx`: sidebar links and active states.
 - `src/pages/`: dashboard, transactions, analytics, users, audit logs,
-  login placeholder, and the unknown-route page.
-- `src/data/mockData.js`: static records and consistent view aggregates.
+  login, and the unknown-route page.
+- `src/services/workspace.js`: workspace API services.
+- `src/hooks/useApiData.js`: cancellable loading, error, and refresh handling.
 - `src/lib/format.js`: IDR currency and Asia/Jakarta date formatting.
 - `src/components/`: shared page headers, stat cards, panels, data tables,
   role badges, loading/empty states, and charts.
 - `src/index.css`: Tailwind imports, theme, and base styles.
 
-## Static mockup
+## Phase 2 static mockup (historical)
+
+The following records describe the original mockup. Phase 13 removed these
+fixtures and connected all core pages to the APIs.
 
 - Dashboard: Total Revenue, Total Orders, Average Order Value, Top Product,
   a revenue trend chart, leading products, and recent transactions.
@@ -380,9 +382,22 @@ route guards, action visibility, and validation.
 - Counts and full-row digests remained unchanged: three users, 750 sales,
   seven audit logs. No frontend business API calls were introduced.
 
-Phase 13 — Replace Mock Data with Real API Data is next and has not started.
-Workspace content still uses static sample data; forms and API mutations
-remain for Phase 13.
+## Phase 13 workspace API integration
+
+See [the workspace API guide](client/WORKSPACE_API.md) for page contracts,
+mutation behavior, pagination, and validation details.
+
+- Replaced all core mock data with API services, loading/empty/error states,
+  retry, and refresh. Charts and dashboard metrics now use BigQuery results.
+- Added transaction creation for Admin/Analyst, confirmed deletion for Admin,
+  and Admin role editing with refreshed rows and current-session validation.
+- ESLint, production build, and all 29 Chromium browser tests passed.
+  Live UI checks through Vite, Express, and BigQuery passed for all three roles.
+- Temporary test users/sales were removed. Original users, sales, and existing
+  audit rows remained unchanged. Six mutation audit records were retained;
+  final counts are three users, 750 sales, and 13 audit logs.
+
+Phase 13 stops here. Phase 14 has not started.
 
 ## Environment configuration
 

@@ -1,7 +1,7 @@
 # Frontend RBAC (Phase 12)
 
 The React workspace now uses the signed-in user's role from the verified
-`/api/auth/me` response to control navigation, page access, and preview actions.
+`/api/auth/me` response to control navigation, page access, and actions.
 See [AUTHENTICATION.md](AUTHENTICATION.md) for login and local startup.
 
 ## Role matrix
@@ -16,11 +16,9 @@ See [AUTHENTICATION.md](AUTHENTICATION.md) for login and local startup.
 | Create transaction button | Visible | Visible | Hidden |
 | Delete transaction buttons | Visible | Hidden | Hidden |
 
-The create/delete controls are disabled because transaction records remain
-read-only sample data. The page states this explicitly. Actual create forms,
-delete confirmation, and mutation refresh are Phase 13 work; this phase does
-not mutate sample data or call business APIs. User role editing also remains
-in Phase 13.
+Create controls open the transaction form for Admin/Analyst. Only Admin can
+open the delete confirmation or edit user roles. Successful mutations refresh
+API data. See [WORKSPACE_API.md](WORKSPACE_API.md) for Phase 13 behavior.
 
 ## Implementation
 
@@ -39,7 +37,8 @@ in Phase 13.
 
 The client does not derive authority from JWT payload hints or local role
 storage. Login/reload/session retry refresh the current user through `/me`.
-A role change is reflected in the UI on the next session validation.
+A role change is reflected in the UI on the next session validation. Updating
+your own role in Users immediately revalidates the session and permissions.
 
 These controls are for UX. Client code can be modified by a browser user;
 [backend RBAC](../server/RBAC.md) independently checks the current active user
@@ -47,7 +46,7 @@ and role for every protected API operation. No backend permissions were
 changed in this phase. The two permission matrices intentionally live on
 opposite sides of the client/server boundary.
 
-## Validation
+## Phase 12 validation (historical)
 
 Commands executed from the repository root:
 
@@ -87,4 +86,5 @@ Results:
   seven audit logs. No other datasets, IAM, or project settings were modified.
 - Local servers started for validation were stopped afterward.
 
-Phase 12 stops here. Phase 13 has not started.
+The results above record Phase 12 before business-data integration. Current
+Phase 13 results are documented in [WORKSPACE_API.md](WORKSPACE_API.md).
