@@ -4,6 +4,7 @@ import helmet from 'helmet'
 import healthRoutes from './routes/healthRoutes.js'
 import { createAuthRoutes } from './routes/authRoutes.js'
 import { createAccessRoutes } from './routes/accessRoutes.js'
+import { createSalesRoutes } from './routes/salesRoutes.js'
 import notFound from './middleware/notFound.js'
 import errorHandler from './middleware/errorHandler.js'
 
@@ -17,6 +18,7 @@ export function createApp(authDependencies) {
   app.use('/api', healthRoutes)
   app.use('/api/auth', createAuthRoutes(authDependencies))
   app.use('/api/access', createAccessRoutes(authDependencies))
+  app.use('/api/sales', createSalesRoutes(authDependencies))
   app.use(notFound)
   app.use(errorHandler)
 
