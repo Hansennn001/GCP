@@ -6,7 +6,8 @@ phases will package the application with Docker and deploy it to Cloud Run.
 
 ## Current status
 
-Phase 3 — Create Express Backend Foundation is complete. An independent
+Phase 4 — BigQuery Setup Scripts and Connection has its code and SQL ready;
+live validation is pending Google Cloud authentication. An independent
 Express API provides a health endpoint and predictable JSON error responses.
 The frontend dashboard, charts, and tables continue to use static sample
 data. All frontend pages remain accessible; login remains a placeholder.
@@ -16,13 +17,13 @@ data. All frontend pages remain accessible; login remains a placeholder.
 ```text
 client/       React frontend built with Vite
 server/       Independent Express API
-scripts/      Future setup and data scripts
+scripts/      BigQuery setup SQL and instructions
 .env.example  Placeholder environment configuration
 .gitignore    Local files and generated output to exclude from Git
 ```
 
-The empty `server/services/`, `server/utils/`, and `scripts/` directories
-contain `.gitkeep` files so Git can preserve them.
+The empty `server/utils/` directory contains a `.gitkeep` file so Git can
+preserve it.
 The implementation plan is in
 [CODEX_BUILD_PLAN_SALES_INSIGHT_DASHBOARD.md](CODEX_BUILD_PLAN_SALES_INSIGHT_DASHBOARD.md).
 Work proceeds one phase at a time, with an explicit instruction required to
@@ -118,10 +119,13 @@ The backend uses Express, CORS, dotenv, and Helmet:
   does not start a listener.
 - `server/index.js`: listener startup and startup error handling.
 - `server/config/env.js`: root `.env` loading and port validation.
+- `server/config/bigquery.js`: lazy ADC-based BigQuery client configuration.
+- `server/services/bigqueryService.js`: reusable parameterized GoogleSQL queries.
+- `server/scripts/checkBigQuery.js`: standalone live connection check.
 - `server/routes/healthRoutes.js`: health route definition.
 - `server/controllers/healthController.js`: health response.
 - `server/middleware/`: JSON 404 and centralized error responses.
-- `server/services/` and `server/utils/`: placeholders for later phases.
+- `server/utils/`: placeholder for later phases.
 - `server/test/app.test.js`: HTTP behavior and configuration checks.
 
 Unknown routes return HTTP 404 with
@@ -209,9 +213,26 @@ is not included in the initial application bundle.
   sanitized synchronous/asynchronous 500 responses, default/custom ports,
   and invalid-port rejection.
 
-No BigQuery connection, authentication, RBAC, or business API endpoints
-have been implemented. Phase 4 — BigQuery Setup Scripts and Connection is
-the next planned phase and has not been started.
+## Phase 4 setup and validation
+
+See [the step-by-step BigQuery guide](scripts/bigquery/README.md) for Google
+login, permissions, dataset/table creation, and connection validation.
+
+- Installed `@google-cloud/bigquery` and the local Google Cloud CLI.
+- Added SQL for `sales_dashboard.users`, `sales_dashboard.sales`, and
+  `sales_dashboard.audit_logs`, plus dataset creation SQL.
+- Configured the target project `id-fpoc-0608-data-posindo` and proposed
+  Jakarta location (`asia-southeast2`). A local ignored `.env` contains
+  only non-secret configuration.
+- Local syntax checks and all ten backend tests passed; health still works
+  without ADC. Service tests use an offline client double and do not prove
+  a live BigQuery connection.
+- The live `npm run check:bigquery` attempt failed without ADC credentials.
+  Dataset/table creation and SQL validation in BigQuery remain pending.
+
+Phase 4 is not yet complete. Finish Google login and live setup/validation
+before proceeding to Phase 5. Authentication, RBAC, business API endpoints,
+and data seeding have not been implemented.
 
 ## Environment configuration
 
@@ -220,9 +241,11 @@ resolved relative to the configuration file, so startup works independently
 of the current working directory. Existing process environment variables
 take precedence over `.env` values.
 
-`PORT` is the only variable currently consumed; it defaults to 8080 and
-must be an integer from 1 to 65535. The remaining `.env.example` values are
-placeholders for later phases. No environment file is needed to run Phase 3.
+`PORT` defaults to 8080 and must be an integer from 1 to 65535. BigQuery
+uses `GOOGLE_CLOUD_PROJECT`, `BIGQUERY_DATASET` (default `sales_dashboard`),
+and `BIGQUERY_LOCATION` (default `asia-southeast2`, which must match the
+dataset location). `JWT_SECRET` is a placeholder for a later phase.
+The health endpoint does not require BigQuery configuration or credentials.
 
 Keep real secrets, passwords, and Google Cloud credentials out of the
 repository. Prefer Application Default Credentials for local Google Cloud
