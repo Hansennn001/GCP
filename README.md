@@ -3,14 +3,14 @@
 A proof-of-concept sales analytics dashboard planned with React, Express,
 JWT authentication, role-based access control, and Google BigQuery. A Docker
 image packages the application and has been validated locally. GCP
-preparation is complete; image publication and Cloud Run deployment remain
-for later phases.
+preparation and image publication are complete; Cloud Run deployment remains
+for a later phase.
 
 ## Current status
 
-Phase 17 — GCP Deployment Preparation is complete. A dedicated Artifact
-Registry repository is ready and a least-privilege runtime IAM strategy is
-documented. The production container
+Phase 18 — Build and Push Container Image is complete. The tested linux/amd64
+image is published in the dedicated Artifact Registry repository. A
+least-privilege runtime IAM strategy is documented. The production container
 serves React and APIs with real BigQuery login and RBAC. Express serves both `/api/*` and the React production build with direct-route refresh
 support. Dashboard, Transactions, Analytics, Users, and Audit Logs load
 through Express APIs
@@ -19,11 +19,12 @@ backed by BigQuery. The application dataset contains three demo users,
 page access, and actions follow the signed-in user's role. Admin/Analyst can
 create transactions; Admin can confirm deletion and update user roles.
 Loading, empty, error/retry, pagination, and mutation refresh states are available.
-Image publication and Cloud Run remain for later phases. See
+Cloud Run deployment remains for a later phase. See
 [production startup](server/PRODUCTION.md),
 [container build](server/CONTAINER_IMAGE.md), and
 [local Docker startup and validation](scripts/docker/LOCAL_DOCKER.md), and
-[GCP preparation](scripts/gcp/DEPLOYMENT_PREPARATION.md).
+[GCP preparation](scripts/gcp/DEPLOYMENT_PREPARATION.md), and
+[published image details](scripts/gcp/IMAGE_PUBLICATION.md).
 
 ## Repository structure
 
@@ -488,7 +489,25 @@ Project/API/repository checks passed. Repository image listing and target-region
 Cloud Run service listing are empty; dataset metadata/ACL is unchanged. Cloud
 Build was not enabled. No image push or deployment was performed.
 
-Phase 17 stops here. Phase 18 has not started.
+## Phase 18 image publication
+
+Built and tested a fresh linux/amd64 image, then pushed it to:
+
+```text
+asia-southeast2-docker.pkg.dev/id-fpoc-0608-data-posindo/sales-insight-dashboard/sales-insight-dashboard:git-6653fac73558
+```
+
+All 31 browser tests passed on the amd64 container. Real BigQuery login, core
+pages, direct-route refresh, and the complete RBAC matrix passed for all three
+roles. Counts/digests remained unchanged: three users, 750 sales, 13 audit logs.
+The remote digest matches the tested image and its manifest includes linux/amd64.
+
+See [publication commands and immutable image URI](scripts/gcp/IMAGE_PUBLICATION.md)
+and [release metadata](scripts/gcp/image-release.json). Runtime identity/IAM and
+JWT-secret setup remain required before deployment. Validation containers and
+temporary credentials were cleaned up.
+
+Phase 18 stops here. Phase 19 has not started; Cloud Run is not deployed.
 
 ## Environment configuration
 

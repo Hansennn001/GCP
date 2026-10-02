@@ -33,6 +33,11 @@ For a different host port:
 LOCAL_DOCKER_PORT=18080 node scripts/docker/run-local.mjs
 ```
 
+For testing a specific image, set `LOCAL_DOCKER_IMAGE`. For amd64 testing on
+this ARM Mac, also set `LOCAL_DOCKER_PLATFORM=linux/amd64`; `linux/arm64` is
+also supported. Defaults still use `sales-insight-dashboard:latest` without
+overriding its platform.
+
 The container still uses port 8080. Host publication is restricted to
 `127.0.0.1`; the application inside the container listens on `0.0.0.0`.
 No host Vite or Express process is needed. Use the demo accounts/passwords
@@ -133,6 +138,7 @@ Additional inline Node/Python checks verified:
 - Ctrl+C shutdown succeeded. The validation container and temporary ADC/config
   copies were confirmed removed. The reusable image remains available locally.
 
-This validates the local linux/arm64 image. Image publication and Cloud
-Run deployment have not started. These results record Phase 16; completed GCP
+This validates the local linux/arm64 image. The tested amd64 image is now published, as
+documented in [IMAGE_PUBLICATION.md](../gcp/IMAGE_PUBLICATION.md). Cloud Run
+deployment has not started. These results record Phase 16; completed GCP
 preparation is documented in [DEPLOYMENT_PREPARATION.md](../gcp/DEPLOYMENT_PREPARATION.md).
