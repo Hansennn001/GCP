@@ -88,5 +88,6 @@ as the history of successful test actions. Final table counts are **3 users,
 IAM policy, or project setting was modified. Local validation servers were
 stopped afterward.
 
-Phase 13 is complete. Phase 14 production integration, Docker, and Cloud Run
-have not started.
+Phase 13 is complete. Express production integration and current validation
+are documented in [PRODUCTION.md](../server/PRODUCTION.md). Docker and Cloud Run
+remain for later phases.

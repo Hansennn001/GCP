@@ -6,14 +6,17 @@ phases will package the application with Docker and deploy it to Cloud Run.
 
 ## Current status
 
-Phase 13 — Replace Mock Data with Real API Data is complete. Dashboard,
-Transactions, Analytics, Users, and Audit Logs load through Express APIs
+Phase 14 — Integration Cleanup and Production Build is complete. Express
+serves both `/api/*` and the React production build with direct-route refresh
+support. Dashboard, Transactions, Analytics, Users, and Audit Logs load
+through Express APIs
 backed by BigQuery. The application dataset contains three demo users,
 750 sales records, and 13 audit logs after validation. Login, session checks,
 page access, and actions follow the signed-in user's role. Admin/Analyst can
 create transactions; Admin can confirm deletion and update user roles.
 Loading, empty, error/retry, pagination, and mutation refresh states are available.
-Production serving, Docker, and Cloud Run remain for later phases.
+Docker and Cloud Run remain for later phases. See
+[production startup and validation](server/PRODUCTION.md).
 
 ## Repository structure
 
@@ -70,8 +73,8 @@ npm run preview
 ```
 
 The production build is generated in `client/dist/` and is ignored by Git.
-The preview command serves that build locally; backend production serving
-belongs to a later phase.
+The preview command serves that build locally. For the complete application
+through Express, follow [the production guide](server/PRODUCTION.md).
 
 ## Local backend setup
 
@@ -131,17 +134,19 @@ The backend uses Express, CORS, dotenv, and Helmet:
 - `server/utils/`: placeholder for later phases.
 - `server/test/app.test.js`: HTTP behavior and configuration checks.
 
-Unknown routes return HTTP 404 with
+Unknown API routes and missing files return HTTP 404 with
 `{"success":false,"message":"Not found"}`. Malformed JSON returns HTTP
 400; JSON bodies exceeding 100 KB return HTTP 413. Internal errors return
 a generic HTTP 500 response without internal messages or stack traces.
 Helmet sets security headers, and the Express identification header is
-disabled. CORS currently permits all origins for this foundation phase;
-deployment configuration will be reviewed in the planned production phase.
+disabled. CORS grants only explicitly configured `CORS_ORIGINS`; the default
+same-origin setup and Vite proxy need no cross-origin grant. Production uses
+Helmet CSP/HSTS; HTTP development disables HTTPS upgrading and HSTS.
 
 The frontend runs through Vite and proxies `/api` requests to Express.
 The API includes authentication, sales, dashboard, analytics, user management,
-and audit-log endpoints. Production static frontend serving belongs to Phase 14.
+and audit-log endpoints. Express also serves `client/dist` when built, with
+React fallback after API routes and static assets.
 
 ## Frontend foundation
 
@@ -397,7 +402,28 @@ mutation behavior, pagination, and validation details.
   audit rows remained unchanged. Six mutation audit records were retained;
   final counts are three users, 750 sales, and 13 audit logs.
 
-Phase 13 stops here. Phase 14 has not started.
+## Phase 14 production integration
+
+See [the production guide](server/PRODUCTION.md) for routing, headers,
+configuration, and detailed validation.
+
+```bash
+npm --prefix client run build
+NODE_ENV=production PORT=8080 npm --prefix server start
+```
+
+Open `http://127.0.0.1:8080`; Vite is not required for production serving.
+Direct React routes support refresh, while missing APIs/assets remain JSON 404.
+Production requires a build. HTML revalidates; hashed assets use immutable caching.
+
+- Server syntax checks, frontend lint, and the production build passed.
+- 54 backend tests, 29 Vite browser tests, and 31 Express production browser
+  tests passed, including the existing auth/RBAC/workspace coverage.
+- Real production browser checks with all three accounts passed, with no
+  runtime/CSP errors. Data counts and full-row digests remained unchanged:
+  three users, 750 sales, and 13 audit logs.
+
+Phase 14 stops here. Phase 15 has not started; no Dockerfile was created.
 
 ## Environment configuration
 
@@ -406,7 +432,10 @@ resolved relative to the configuration file, so startup works independently
 of the current working directory. Existing process environment variables
 take precedence over `.env` values.
 
-`PORT` defaults to 8080 and must be an integer from 1 to 65535. BigQuery
+`NODE_ENV=production` requires the React build and enables production headers.
+`CORS_ORIGINS` optionally grants exact comma-separated HTTP(S) origins; it
+defaults to empty. `PORT` defaults to 8080 and must be an integer from 1 to
+65535. BigQuery
 uses `GOOGLE_CLOUD_PROJECT`, `BIGQUERY_DATASET` (default `sales_dashboard`),
 and `BIGQUERY_LOCATION` (default `asia-southeast2`, which must match the
 dataset location). `JWT_SECRET` must be a random secret of at least 32 bytes

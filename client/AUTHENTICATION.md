@@ -58,8 +58,9 @@ existing server RBAC.
 
 Dashboard, analytics, users, audit logs, and transactions now call protected
 business APIs as documented in [WORKSPACE_API.md](WORKSPACE_API.md). Serving
-the React production build from Express, Docker, and Cloud Run remain for
-later phases.
+the React production build from Express is documented in
+[the production guide](../server/PRODUCTION.md). Docker and Cloud Run remain
+for later phases.
 
 ## Validation
 
