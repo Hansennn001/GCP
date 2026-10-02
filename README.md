@@ -6,23 +6,23 @@ phases will package the application with Docker and deploy it to Cloud Run.
 
 ## Current status
 
-Phase 2 — Improve Frontend Dashboard Mockup is complete. The frontend has
-a dashboard, analytics charts, and transaction, user, and audit log tables
-using static sample data. Authentication is not required in this phase;
-all pages are accessible. The login route remains a placeholder.
+Phase 3 — Create Express Backend Foundation is complete. An independent
+Express API provides a health endpoint and predictable JSON error responses.
+The frontend dashboard, charts, and tables continue to use static sample
+data. All frontend pages remain accessible; login remains a placeholder.
 
 ## Repository structure
 
 ```text
 client/       React frontend built with Vite
-server/       Future Express backend
+server/       Independent Express API
 scripts/      Future setup and data scripts
 .env.example  Placeholder environment configuration
 .gitignore    Local files and generated output to exclude from Git
 ```
 
-The empty `server/` and `scripts/` directories contain `.gitkeep` files so
-Git can preserve them.
+The empty `server/services/`, `server/utils/`, and `scripts/` directories
+contain `.gitkeep` files so Git can preserve them.
 The implementation plan is in
 [CODEX_BUILD_PLAN_SALES_INSIGHT_DASHBOARD.md](CODEX_BUILD_PLAN_SALES_INSIGHT_DASHBOARD.md).
 Work proceeds one phase at a time, with an explicit instruction required to
@@ -68,6 +68,73 @@ npm run preview
 The production build is generated in `client/dist/` and is ignored by Git.
 The preview command serves that build locally; backend production serving
 belongs to a later phase.
+
+## Local backend setup
+
+From the repository root, using the same Node.js versions as the frontend:
+
+```bash
+cd server
+npm install
+npm run dev
+```
+
+The development script uses Node's watch mode. For a normal start, run
+`npm start` from `server/`. The API listens on `0.0.0.0` and defaults to
+port 8080. To use a different port:
+
+```bash
+PORT=18083 npm start
+```
+
+Verify the default health endpoint:
+
+```bash
+curl --fail-with-body http://localhost:8080/api/health
+```
+
+Expected HTTP 200 response:
+
+```json
+{"status":"ok","service":"sales-insight-dashboard"}
+```
+
+From `server/`, run the backend checks:
+
+```bash
+npm run check
+npm test
+```
+
+`check` validates application JavaScript syntax. The tests use Node's
+built-in test runner and temporary local HTTP listeners, so they do not
+require a running server, database, or Google Cloud credentials.
+
+## Backend foundation
+
+The backend uses Express, CORS, dotenv, and Helmet:
+
+- `server/app.js`: middleware setup and route registration; importing it
+  does not start a listener.
+- `server/index.js`: listener startup and startup error handling.
+- `server/config/env.js`: root `.env` loading and port validation.
+- `server/routes/healthRoutes.js`: health route definition.
+- `server/controllers/healthController.js`: health response.
+- `server/middleware/`: JSON 404 and centralized error responses.
+- `server/services/` and `server/utils/`: placeholders for later phases.
+- `server/test/app.test.js`: HTTP behavior and configuration checks.
+
+Unknown routes return HTTP 404 with
+`{"success":false,"message":"Not found"}`. Malformed JSON returns HTTP
+400; JSON bodies exceeding 100 KB return HTTP 413. Internal errors return
+a generic HTTP 500 response without internal messages or stack traces.
+Helmet sets security headers, and the Express identification header is
+disabled. CORS currently permits all origins for this foundation phase;
+deployment configuration will be reviewed in the planned production phase.
+
+The API currently provides only `/api/health`. The frontend still runs
+through Vite independently and does not call the API. Production static
+frontend serving belongs to Phase 14.
 
 ## Frontend foundation
 
@@ -130,13 +197,33 @@ is not included in the initial application bundle.
 - Final browser checks reported no API requests, console/runtime errors,
   chart size warnings, or HTTP resource errors.
 
-No API integration, authentication, role enforcement, or Express code has
-been added. Phase 3 — Create Express Backend Foundation is the next phase and
-has not been started.
+## Phase 3 validation
+
+- Backend dependencies installed successfully with zero reported npm audit
+  vulnerabilities.
+- JavaScript syntax checks and all seven backend tests passed.
+- `npm start` served the expected health response on port 8080.
+- `PORT=18083 npm run dev` served the same response on the configured port.
+- Live HTTP checks confirmed JSON 404 and malformed-body 400 responses.
+- Tests verified security headers, CORS preflight, oversized-body 413,
+  sanitized synchronous/asynchronous 500 responses, default/custom ports,
+  and invalid-port rejection.
+
+No BigQuery connection, authentication, RBAC, or business API endpoints
+have been implemented. Phase 4 — BigQuery Setup Scripts and Connection is
+the next planned phase and has not been started.
 
 ## Environment configuration
 
-`.env.example` documents the planned variables using placeholder values.
+The backend optionally reads `.env` at the repository root. Its path is
+resolved relative to the configuration file, so startup works independently
+of the current working directory. Existing process environment variables
+take precedence over `.env` values.
+
+`PORT` is the only variable currently consumed; it defaults to 8080 and
+must be an integer from 1 to 65535. The remaining `.env.example` values are
+placeholders for later phases. No environment file is needed to run Phase 3.
+
 Keep real secrets, passwords, and Google Cloud credentials out of the
 repository. Prefer Application Default Credentials for local Google Cloud
 authentication when BigQuery integration is implemented.
