@@ -27,7 +27,7 @@ export default function Sidebar({ open, onNavigate }) {
       </div>
       <nav aria-label="Main navigation" className="flex-1 space-y-1 px-4 py-7">
         <p className="mb-3 px-3 text-[10px] font-semibold tracking-[0.18em] text-slate-500 uppercase">Workspace</p>
-        {navigation.map(({ path, title, icon: Icon }, index) => (
+        {navigation.filter(page => page.path !== '/login').map(({ path, title, icon: Icon }, index) => (
           <NavLink
             key={path}
             to={path}

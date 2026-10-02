@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router'
 import DashboardLayout from '@/layouts/DashboardLayout'
-import PlaceholderPage from '@/pages/PlaceholderPage'
+import LoginPage from '@/pages/LoginPage'
+import ProtectedRoute from '@/components/SessionGate'
 import NotFoundPage from '@/pages/NotFoundPage'
 import { navigation } from '@/lib/navigation'
 import DashboardPage from '@/pages/DashboardPage'
@@ -20,13 +21,16 @@ const pages = {
 export default function App() {
   return (
     <Routes>
-      <Route element={<DashboardLayout />}>
-        <Route index element={<Navigate to="/dashboard" replace />} />
-        {navigation.map((page) => {
-          const Page = pages[page.path]
-          return <Route key={page.path} path={page.path} element={Page ? <Page /> : <PlaceholderPage page={page} />} />
-        })}
-        <Route path="*" element={<NotFoundPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<DashboardLayout />}>
+          <Route index element={<Navigate to="/dashboard" replace />} />
+          {navigation.filter(page => page.path !== '/login').map((page) => {
+            const Page = pages[page.path]
+            return <Route key={page.path} path={page.path} element={<Page />} />
+          })}
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
       </Route>
     </Routes>
   )
