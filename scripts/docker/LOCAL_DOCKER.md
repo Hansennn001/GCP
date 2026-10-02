@@ -133,5 +133,6 @@ Additional inline Node/Python checks verified:
 - Ctrl+C shutdown succeeded. The validation container and temporary ADC/config
   copies were confirmed removed. The reusable image remains available locally.
 
-This validates the local linux/arm64 image. Phase 17 GCP preparation and Cloud
-Run deployment have not started. Phase 16 stops here.
+This validates the local linux/arm64 image. Image publication and Cloud
+Run deployment have not started. These results record Phase 16; completed GCP
+preparation is documented in [DEPLOYMENT_PREPARATION.md](../gcp/DEPLOYMENT_PREPARATION.md).

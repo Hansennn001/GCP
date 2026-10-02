@@ -3,11 +3,14 @@
 A proof-of-concept sales analytics dashboard planned with React, Express,
 JWT authentication, role-based access control, and Google BigQuery. A Docker
 image packages the application and has been validated locally. GCP
-preparation and Cloud Run deployment remain for later phases.
+preparation is complete; image publication and Cloud Run deployment remain
+for later phases.
 
 ## Current status
 
-Phase 16 — Local Docker Deployment is complete. The production container
+Phase 17 — GCP Deployment Preparation is complete. A dedicated Artifact
+Registry repository is ready and a least-privilege runtime IAM strategy is
+documented. The production container
 serves React and APIs with real BigQuery login and RBAC. Express serves both `/api/*` and the React production build with direct-route refresh
 support. Dashboard, Transactions, Analytics, Users, and Audit Logs load
 through Express APIs
@@ -16,10 +19,11 @@ backed by BigQuery. The application dataset contains three demo users,
 page access, and actions follow the signed-in user's role. Admin/Analyst can
 create transactions; Admin can confirm deletion and update user roles.
 Loading, empty, error/retry, pagination, and mutation refresh states are available.
-GCP preparation and Cloud Run remain for later phases. See
+Image publication and Cloud Run remain for later phases. See
 [production startup](server/PRODUCTION.md),
 [container build](server/CONTAINER_IMAGE.md), and
-[local Docker startup and validation](scripts/docker/LOCAL_DOCKER.md).
+[local Docker startup and validation](scripts/docker/LOCAL_DOCKER.md), and
+[GCP preparation](scripts/gcp/DEPLOYMENT_PREPARATION.md).
 
 ## Repository structure
 
@@ -461,7 +465,30 @@ Ctrl+C stops/removes its container and cleans up its temporary credentials.
 The validation container was stopped afterward; run the command to restart it.
 See [the local Docker guide](scripts/docker/LOCAL_DOCKER.md) for details.
 
-Phase 16 stops here. Phase 17 and Cloud Run deployment have not started.
+## Phase 17 GCP deployment preparation
+
+Selected `id-fpoc-0608-data-posindo` and enabled Artifact Registry, Cloud Run,
+and IAM APIs. BigQuery, Logging, and Secret Manager were already enabled.
+Created only the dedicated standard Docker repository `sales-insight-dashboard`
+in `asia-southeast2`. No existing workload or dataset ACL was modified.
+
+Expected future image path:
+
+```text
+asia-southeast2-docker.pkg.dev/id-fpoc-0608-data-posindo/sales-insight-dashboard/sales-insight-dashboard:TAG
+```
+
+The [preparation guide](scripts/gcp/DEPLOYMENT_PREPARATION.md) records commands,
+resource purposes, deployer permissions, and a planned dedicated runtime account
+with custom BigQuery roles scoped to SQL jobs and the three app tables. Runtime
+account/custom-role creation and bindings are planned, not applied. The future
+cloud image must include linux/amd64; the tested local image is arm64.
+
+Project/API/repository checks passed. Repository image listing and target-region
+Cloud Run service listing are empty; dataset metadata/ACL is unchanged. Cloud
+Build was not enabled. No image push or deployment was performed.
+
+Phase 17 stops here. Phase 18 has not started.
 
 ## Environment configuration
 
