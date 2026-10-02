@@ -126,7 +126,9 @@ Phase 4 completed on 2 October 2026:
   service JSON.
 - No existing datasets/tables, IAM, or project settings were modified.
 
-No credentials were added to the repository. Phase 5 has not started.
+No credentials were added to the repository. Phase 5 subsequently added
+demo users and sales; see [the seeding guide](SEEDING.md) for the current
+data state and safe rerun instructions. Do not rerun resource creation.
 
 References: [CLI installation](https://docs.cloud.google.com/sdk/docs/install-sdk),
 [local ADC](https://docs.cloud.google.com/docs/authentication/set-up-adc-local-dev-environment),

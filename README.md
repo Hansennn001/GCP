@@ -6,8 +6,8 @@ phases will package the application with Docker and deploy it to Cloud Run.
 
 ## Current status
 
-Phase 4 — BigQuery Setup Scripts and Connection is complete. A new dataset
-and three empty tables were created and validated in BigQuery. An independent
+Phase 5 — BigQuery Seed Data is complete. The application dataset now has
+three demo users and 750 sample sales records. An independent
 Express API provides a health endpoint and predictable JSON error responses.
 The frontend dashboard, charts, and tables continue to use static sample
 data. All frontend pages remain accessible; login remains a placeholder.
@@ -231,14 +231,34 @@ login, permissions, dataset/table creation, and connection validation.
 - SQL uses strict `CREATE` statements: existing resources cause an error
   rather than being reused or replaced. Do not rerun setup against an
   existing dataset.
-- All three table schemas match the build plan and contain zero rows.
+- At the end of Phase 4, all three table schemas matched the build plan
+  and contained zero rows.
 - Local syntax checks and all ten backend tests passed. The live
   `npm run check:bigquery` succeeded using ADC, and the running Express
   health endpoint returned HTTP 200 with the expected service JSON.
 
-Phase 5 — BigQuery Seed Data is the next phase and has not started.
-Application authentication, RBAC, business API endpoints, and data seeding
-have not been implemented.
+## Phase 5 seed and validation
+
+See [the demo seeding guide](scripts/bigquery/SEEDING.md) for demo accounts,
+Keychain password retrieval, safe reruns, and validation details.
+
+- Added deterministic sales generation, bcrypt user hashing, and
+  `npm run seed` in `server/`.
+- Seeded only `id-fpoc-0608-data-posindo.sales_dashboard`: three active
+  demo users and 750 transactions covering six products, five regions,
+  and April–September 2026. Audit logs remain empty.
+- Passwords are stored in macOS Keychain; BigQuery contains bcrypt hashes
+  with cost factor 12. No plaintext passwords are stored in repo files.
+- Seed reruns insert missing records only, preserve existing rows and
+  credentials, and abort on conflicting user identities.
+- Live validation confirmed each bcrypt hash matches its demo password.
+  Rerun checks confirmed unchanged row digests, no duplicates, and no
+  changes to audit logs.
+- Syntax checks, all 12 backend tests, the BigQuery connection check, and
+  the live health endpoint passed.
+
+Phase 6 — Backend Authentication is next and has not started. Application
+authentication, RBAC, and business API endpoints have not been implemented.
 
 ## Environment configuration
 
