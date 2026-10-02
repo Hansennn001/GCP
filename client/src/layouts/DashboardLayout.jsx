@@ -43,7 +43,7 @@ export default function DashboardLayout() {
             <ChevronRight aria-hidden="true" className="hidden size-3 text-slate-300 sm:block" />
             <span className="truncate font-medium text-slate-700">{title}</span>
           </div>
-          <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-500">Workspace preview</span>
+          <span className="shrink-0 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">Sample data</span>
         </header>
         <main id="main-content" tabIndex={-1} className="mx-auto max-w-7xl px-5 py-8 outline-none sm:px-8 lg:px-10 lg:py-10">
           <Outlet />

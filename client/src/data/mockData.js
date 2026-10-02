@@ -32,7 +32,7 @@ export const sales = [
 
 export const auditLogs = [
   { log_id: 'LOG006', user: 'Nadia Putri', action: 'CREATE_SALE', resource: 'SAL018', details: 'Created an App Modernization transaction.', created_at: '2026-09-29T03:30:00Z' },
-  { log_id: 'LOG005', user: 'Nadia Putri', action: 'UPDATE_ROLE', resource: 'USR004', details: 'Changed Dimas Wijaya from viewer to analyst.', created_at: '2026-09-24T07:15:00Z' },
+  { log_id: 'LOG005', user: 'Nadia Putri', action: 'UPDATE_ROLE', resource: 'USR003', details: 'Changed Maya Sari from analyst to viewer.', created_at: '2026-09-24T07:15:00Z' },
   { log_id: 'LOG004', user: 'Arif Pratama', action: 'LOGIN', resource: 'Session', details: 'Signed in to the workspace.', created_at: '2026-09-22T02:05:00Z' },
   { log_id: 'LOG003', user: 'Dimas Wijaya', action: 'CREATE_SALE', resource: 'SAL017', details: 'Created a Data Analytics transaction.', created_at: '2026-09-19T04:45:00Z' },
   { log_id: 'LOG002', user: 'Nadia Putri', action: 'DELETE_SALE', resource: 'SAL019', details: 'Removed a duplicate transaction.', created_at: '2026-09-15T06:20:00Z' },
