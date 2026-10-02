@@ -1,13 +1,14 @@
 # Sales Insight Dashboard
 
 A proof-of-concept sales analytics dashboard planned with React, Express,
-JWT authentication, role-based access control, and Google BigQuery. Later
-phases will package the application with Docker and deploy it to Cloud Run.
+JWT authentication, role-based access control, and Google BigQuery. A Docker
+image now packages the application; local container deployment and Cloud Run
+remain for later phases.
 
 ## Current status
 
-Phase 14 — Integration Cleanup and Production Build is complete. Express
-serves both `/api/*` and the React production build with direct-route refresh
+Phase 15 — Dockerfile is complete. The multi-stage production image builds
+successfully and is configured to run as a non-root user. Express serves both `/api/*` and the React production build with direct-route refresh
 support. Dashboard, Transactions, Analytics, Users, and Audit Logs load
 through Express APIs
 backed by BigQuery. The application dataset contains three demo users,
@@ -15,8 +16,9 @@ backed by BigQuery. The application dataset contains three demo users,
 page access, and actions follow the signed-in user's role. Admin/Analyst can
 create transactions; Admin can confirm deletion and update user roles.
 Loading, empty, error/retry, pagination, and mutation refresh states are available.
-Docker and Cloud Run remain for later phases. See
-[production startup and validation](server/PRODUCTION.md).
+Local Docker deployment and Cloud Run remain for later phases. See
+[production startup](server/PRODUCTION.md) and
+[container build and validation](server/CONTAINER_IMAGE.md).
 
 ## Repository structure
 
@@ -423,7 +425,23 @@ Production requires a build. HTML revalidates; hashed assets use immutable cachi
   runtime/CSP errors. Data counts and full-row digests remained unchanged:
   three users, 750 sales, and 13 audit logs.
 
-Phase 14 stops here. Phase 15 has not started; no Dockerfile was created.
+## Phase 15 container image
+
+Created `Dockerfile` and `.dockerignore`. The build generates React in Linux,
+installs backend production dependencies, and copies the production app into
+an official Node.js runtime pinned by digest. The runtime uses the non-root
+`node` user and default port 8080. Secrets and unnecessary files are excluded.
+
+```bash
+docker build -t sales-insight-dashboard .
+```
+
+Build, Dockerfile checks, filtered-context checks, and image inspections passed.
+The local image is linux/arm64 (84.8 MB reported by Docker). Inspection used a
+stopped container that was removed; the application was not started in Docker.
+See [the image guide](server/CONTAINER_IMAGE.md) for validation details.
+
+Phase 15 stops here. Phase 16 and Cloud Run deployment have not started.
 
 ## Environment configuration
 

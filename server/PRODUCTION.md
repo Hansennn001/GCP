@@ -2,7 +2,9 @@
 
 Express serves the API and the built React application from one origin. Vite
 is needed to build the frontend, but no Vite process is needed to serve it.
-Docker and Cloud Run deployment belong to subsequent phases.
+Docker image build instructions are now in
+[CONTAINER_IMAGE.md](CONTAINER_IMAGE.md). Local Docker deployment and Cloud Run
+belong to subsequent phases.
 
 ## Run locally
 
@@ -122,5 +124,7 @@ Full-row digests and counts before/after were identical: **3 users, 750 sales,
 13 audit logs**. This phase introduced no cloud data mutations or changes to
 other datasets, IAM, or project settings. Validation servers were stopped.
 
-Phase 14 stops here. No Dockerfile or `.dockerignore` was created. Phase 15
-has not started.
+The results above record Phase 14 production integration. Phase 15 image
+build and inspection results are documented in
+[CONTAINER_IMAGE.md](CONTAINER_IMAGE.md). Local container deployment remains
+for Phase 16.
