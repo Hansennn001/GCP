@@ -1,7 +1,8 @@
 # Backend authentication (Phase 6)
 
-The API authenticates users from the app's BigQuery `users` table. Frontend
-login integration and role authorization belong to later phases.
+The API authenticates users from the app's BigQuery `users` table. Backend
+role authorization is documented in [RBAC.md](RBAC.md); frontend login
+integration belongs to a later phase.
 
 ## Local setup
 

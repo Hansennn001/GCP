@@ -6,10 +6,10 @@ phases will package the application with Docker and deploy it to Cloud Run.
 
 ## Current status
 
-Phase 6 — Backend Authentication is complete. The application dataset has
+Phase 7 — Backend RBAC is complete. The application dataset has
 three demo users and 750 sample sales records. The Express API provides
 BigQuery-backed bcrypt login, JWT authentication, `/api/auth/me`, a health
-endpoint, and predictable JSON error responses.
+endpoint, reusable role guards, and read-only permission probes.
 The frontend dashboard, charts, and tables continue to use static sample
 data. All frontend pages remain accessible; login remains a placeholder.
 
@@ -274,7 +274,24 @@ secret setup, API contracts, and validation details.
 - BigQuery counts remained three users, 750 sales, and zero audit logs;
   authentication did not modify cloud resources.
 
-Phase 7 — Backend RBAC is next and has not started. Frontend authentication
+## Phase 7 role authorization
+
+See [the backend RBAC guide](server/RBAC.md) for the permission matrix,
+reusable middleware, and read-only `/api/access/<permission>` checks.
+
+- Added `authorizeRoles(...)` for Admin-only operations, Admin/Analyst sales
+  creation, and read permissions for all three roles.
+- Each guard checks the current active user and role in BigQuery so revoked
+  privileges are not retained by previously issued tokens.
+- Missing/invalid JWTs return 401; insufficient roles return 403. The access
+  probes only demonstrate authorization; they do not perform business actions.
+- Syntax checks and all 26 backend tests passed. Live checks passed for all
+  eight permissions across the three demo accounts (24 permission checks).
+  Every probe rejected missing/invalid JWTs with 401, and health returned 200.
+- BigQuery counts remained three users, 750 sales, and zero audit logs; no
+  cloud resources or records were changed.
+
+Phase 8 — Sales Backend API is next and has not started. Frontend authentication
 integration and business API endpoints remain for later phases.
 
 ## Environment configuration
