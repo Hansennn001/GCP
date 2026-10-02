@@ -120,7 +120,7 @@ test('reusable role guard requires authentication and exposes only safe current 
 })
 
 test('permission probes do not expose future business routes or mutation methods', async () => {
-  for (const path of ['/api/users', '/api/audit-logs', '/api/access/unknown']) {
+  for (const path of ['/api/access/unknown']) {
     assert.equal((await fetch(`${baseUrl}${path}`)).status, 404)
   }
   for (const method of ['POST', 'PATCH', 'DELETE']) {

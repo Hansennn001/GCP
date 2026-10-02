@@ -106,14 +106,14 @@ test('aggregation failures return sanitized 500 responses for every endpoint', a
   } finally { fail = false }
 })
 
-test('reporting endpoints are read-only and Phase 10 routes remain absent', async () => {
+test('reporting endpoints are read-only and unknown routes remain absent', async () => {
   const beforeCalls = calls
   for (const [path] of endpoints) {
     for (const method of ['POST', 'PATCH', 'DELETE']) {
       assert.equal((await request(path, tokenFor('admin'), method)).status, 404)
     }
   }
-  for (const path of ['/users', '/users/DEMO_VIEWER/role', '/audit-logs']) {
+  for (const path of ['/unknown', '/analytics/unknown', '/dashboard/unknown']) {
     assert.equal((await request(path, tokenFor('admin'))).status, 404)
   }
   assert.equal(calls, beforeCalls)
