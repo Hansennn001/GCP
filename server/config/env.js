@@ -13,6 +13,7 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
 
 export default {
   port,
+  jwtSecret: process.env.JWT_SECRET ?? '',
   bigquery: {
     projectId: process.env.GOOGLE_CLOUD_PROJECT?.trim() ?? '',
     dataset: process.env.BIGQUERY_DATASET?.trim() || 'sales_dashboard',
