@@ -5,5 +5,5 @@ const styles = {
 }
 
 export default function RoleBadge({ role }) {
-  return <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium capitalize ring-1 ring-inset ${styles[role] ?? styles.viewer}`}>{role}</span>
+  return <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium capitalize ring-1 ring-inset ${Object.hasOwn(styles, role) ? styles[role] : styles.viewer}`}>{Object.hasOwn(styles, role) ? role : 'Unknown role'}</span>
 }

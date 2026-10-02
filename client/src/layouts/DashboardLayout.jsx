@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { ChevronRight, LogOut, Menu, PanelsTopLeft, X } from 'lucide-react'
 import { Link, Outlet, useLocation } from 'react-router'
 import { useAuth } from '@/hooks/useAuth'
+import RoleBadge from '@/components/RoleBadge'
+import { can } from '@/lib/permissions'
 import Sidebar from '@/components/Sidebar'
 import { Button } from '@/components/ui/button'
 import { navigation } from '@/lib/navigation'
@@ -11,7 +13,7 @@ export default function DashboardLayout() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { pathname } = useLocation()
   const page = navigation.find((item) => item.path === pathname)
-  const title = page?.title ?? 'Page not found'
+  const title = page?.permission && !can(user, page.permission) ? 'Access restricted' : page?.title ?? 'Page not found'
 
   useEffect(() => {
     document.title = `${title} | Sales Insight Dashboard`
@@ -45,8 +47,9 @@ export default function DashboardLayout() {
             <ChevronRight aria-hidden="true" className="hidden size-3 text-slate-300 sm:block" />
             <span className="truncate font-medium text-slate-700">{title}</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <span className="hidden text-sm text-slate-600 sm:block">{user.name}</span>
+            <span aria-label="Current role"><RoleBadge role={user.role} /></span>
             <span className="hidden rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 md:block">Sample data</span>
             <Button variant="outline" onClick={logout} className="h-10"><LogOut aria-hidden="true" />Sign out</Button>
           </div>

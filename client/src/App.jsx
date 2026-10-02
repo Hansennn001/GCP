@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router'
 import DashboardLayout from '@/layouts/DashboardLayout'
 import LoginPage from '@/pages/LoginPage'
 import ProtectedRoute from '@/components/SessionGate'
+import PermissionRoute from '@/components/PermissionRoute'
 import NotFoundPage from '@/pages/NotFoundPage'
 import { navigation } from '@/lib/navigation'
 import DashboardPage from '@/pages/DashboardPage'
@@ -27,7 +28,7 @@ export default function App() {
           <Route index element={<Navigate to="/dashboard" replace />} />
           {navigation.filter(page => page.path !== '/login').map((page) => {
             const Page = pages[page.path]
-            return <Route key={page.path} path={page.path} element={<Page />} />
+            return <Route key={page.path} path={page.path} element={<PermissionRoute permission={page.permission}><Page /></PermissionRoute>} />
           })}
           <Route path="*" element={<NotFoundPage />} />
         </Route>

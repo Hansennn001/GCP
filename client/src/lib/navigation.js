@@ -3,6 +3,7 @@ import { ChartNoAxesCombined, LayoutDashboard, LogIn, ReceiptText, ScrollText, U
 export const navigation = [
   {
     path: '/dashboard',
+    permission: 'dashboard.read',
     title: 'Dashboard',
     section: 'Overview',
     icon: LayoutDashboard,
@@ -11,6 +12,7 @@ export const navigation = [
   },
   {
     path: '/transactions',
+    permission: 'sales.read',
     title: 'Transactions',
     section: 'Workspace',
     icon: ReceiptText,
@@ -19,6 +21,7 @@ export const navigation = [
   },
   {
     path: '/analytics',
+    permission: 'analytics.read',
     title: 'Analytics',
     section: 'Workspace',
     icon: ChartNoAxesCombined,
@@ -27,6 +30,7 @@ export const navigation = [
   },
   {
     path: '/users',
+    permission: 'users.read',
     title: 'Users',
     section: 'Administration',
     icon: Users,
@@ -35,6 +39,7 @@ export const navigation = [
   },
   {
     path: '/audit-logs',
+    permission: 'audit-logs.read',
     title: 'Audit Logs',
     section: 'Administration',
     icon: ScrollText,
