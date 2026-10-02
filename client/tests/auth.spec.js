@@ -1,8 +1,10 @@
 import { test, expect } from '@playwright/test'
+import { workspaceFixtures } from './workspaceFixtures'
 
 const user = { userId: 'TEST_VIEWER', name: 'Test Viewer', email: 'viewer@example.com', role: 'viewer', status: 'active' }
 const token = 'test-only-mocked-token'
 const key = 'sales-insight-token'
+test.beforeEach(async ({ page }) => workspaceFixtures(page))
 async function successfulApi(page) {
   await page.route('**/api/auth/login', async route => {
     expect(route.request().postDataJSON()).toEqual({ email: user.email, password: 'test-password' })

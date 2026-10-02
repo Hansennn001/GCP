@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test'
+import { workspaceFixtures } from './workspaceFixtures'
+test.beforeEach(async ({ page }) => workspaceFixtures(page))
 
 const makeUser = role => ({ userId: `TEST_${role}`, name: `Test ${role}`, email: `${role}@example.com`, role, status: 'active' })
 async function session(page, user) {
@@ -24,13 +26,13 @@ for (const role of ['admin', 'analyst', 'viewer']) {
       const create = page.getByRole('button', { name: 'Create transaction', exact: true })
       const remove = page.getByRole('button', { name: /^Delete transaction / })
       if (role === 'viewer') await expect(create).toHaveCount(0)
-      else { await expect(create).toBeVisible(); await expect(create).toBeDisabled() }
+      else { await expect(create).toBeVisible(); await expect(create).toBeEnabled() }
       if (role === 'admin') {
+        await expect(remove.first()).toBeVisible()
         expect(await remove.count()).toBeGreaterThan(0)
-        await expect(remove.first()).toBeDisabled()
+        await expect(remove.first()).toBeEnabled()
       } else await expect(remove).toHaveCount(0)
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
-      // Sample records remain read-only until Phase 13 mutation integration.
     })
   }
 }
