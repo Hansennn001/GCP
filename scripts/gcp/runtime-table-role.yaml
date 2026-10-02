@@ -1,0 +1,7 @@
+title: Sales Insight Table Data
+description: Read metadata/data and perform DML only on explicitly bound application tables.
+stage: GA
+includedPermissions:
+  - bigquery.tables.get
+  - bigquery.tables.getData
+  - bigquery.tables.updateData
