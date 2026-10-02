@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `id-fpoc-0608-data-posindo.sales_dashboard.sales` (
+CREATE TABLE `id-fpoc-0608-data-posindo.sales_dashboard.sales` (
   sale_id STRING,
   sale_date DATE,
   product STRING,
