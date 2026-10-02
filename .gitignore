@@ -24,3 +24,8 @@ application_default_credentials.json
 *.log
 .DS_Store
 Thumbs.db
+
+# Browser test output (may include private session data)
+playwright-report/
+test-results/
+playwright/.auth/
