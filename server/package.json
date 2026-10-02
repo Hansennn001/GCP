@@ -1,0 +1,20 @@
+{
+  "name": "sales-insight-dashboard-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^22.13.0 || >=24.0.0"
+  },
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js",
+    "check": "node --check app.js && node --check index.js && node --check config/env.js && node --check controllers/healthController.js && node --check routes/healthRoutes.js && node --check middleware/notFound.js && node --check middleware/errorHandler.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
+    "helmet": "^8.3.0"
+  }
+}
