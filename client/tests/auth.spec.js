@@ -71,14 +71,12 @@ test('session verification failure retains the token for retry and does not expo
 
 test('API 401 after login clears the session and redirects', async ({ page }) => {
   await successfulApi(page)
-  await page.route('**/api/session-test', route => route.fulfill({ status: 401, json: { success: false } }))
   await page.goto('/login')
   await signIn(page)
   await expect(page).toHaveURL(/\/dashboard$/)
-  await page.evaluate(async () => {
-    const { apiRequest } = await import('/src/services/api.js')
-    await apiRequest('/session-test').catch(() => {})
-  })
+  await expect(page.getByRole('table', { name: 'Recent transactions' })).toContainText('API Product')
+  await page.route('**/api/sales?*', route => route.fulfill({ status: 401, json: { success: false } }))
+  await page.getByRole('link', { name: 'Transactions', exact: true }).click()
   await expect(page).toHaveURL(/\/login$/)
   expect(await page.evaluate(key => sessionStorage.getItem(key), key)).toBeNull()
 })

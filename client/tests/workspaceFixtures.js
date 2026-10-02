@@ -3,7 +3,7 @@ export const testUsers = ['admin', 'analyst', 'viewer'].map(role => ({ userId: `
 export async function workspaceFixtures(page, { sales = [testSale], users = testUsers, logs = [{ logId: 'TEST_LOG', userId: 'TEST_admin', action: 'CREATE_SALE', resource: 'sales', details: '{}', createdAt: '2026-10-02T00:00:00Z' }], onRequest } = {}) {
   await page.route('**/api/**', async route => {
     const url = new URL(route.request().url())
-    if (url.pathname.startsWith('/api/auth/') || url.pathname === '/api/session-test') return route.fallback()
+    if (url.pathname.startsWith('/api/auth/')) return route.fallback()
     if (onRequest && await onRequest(route)) return
     const offset = Number(url.searchParams.get('offset') ?? 0)
     const limit = Number(url.searchParams.get('limit') ?? 50)

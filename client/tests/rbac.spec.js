@@ -1,3 +1,4 @@
+import { can, hasRole } from '../src/lib/permissions.js'
 import { test, expect } from '@playwright/test'
 import { workspaceFixtures } from './workspaceFixtures'
 test.beforeEach(async ({ page }) => workspaceFixtures(page))
@@ -69,10 +70,7 @@ test('unknown roles fail closed and cannot gain permissions through storage hint
   await expect(page.getByRole('heading', { name: 'Access restricted' })).toBeVisible()
   await expect(page.getByLabel('Current role')).toHaveText('Unknown role')
   await expect(page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link')).toHaveCount(0)
-  const results = await page.evaluate(async () => {
-    const { can, hasRole } = await import('/src/lib/permissions.js')
-    return [can(null, 'users.read'), can({ role: 'admin' }, 'constructor'), can({ role: 'toString' }, 'sales.read'), hasRole({ role: 'superadmin' }, 'superadmin')]
-  })
+  const results = [can(null, 'users.read'), can({ role: 'admin' }, 'constructor'), can({ role: 'toString' }, 'sales.read'), hasRole({ role: 'superadmin' }, 'superadmin')]
   expect(results).toEqual([false, false, false, false])
 })
 
