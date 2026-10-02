@@ -6,12 +6,12 @@ phases will package the application with Docker and deploy it to Cloud Run.
 
 ## Current status
 
-Phase 9 — Dashboard and Analytics Backend API is complete. The application dataset has
+Phase 10 — User Management and Audit API is complete. The application dataset has
 three demo users and 750 sample sales records. The Express API provides
 BigQuery-backed bcrypt login, JWT authentication, `/api/auth/me`, a health
 endpoint, reusable role guards, permission probes, and a sales API with
 transactional create/delete audit logs, plus BigQuery dashboard and analytics
-aggregations.
+aggregations, Admin user management, and audit-log listing.
 The frontend dashboard, charts, and tables continue to use static sample
 data. All frontend pages remain accessible; login remains a placeholder.
 
@@ -328,8 +328,25 @@ metric definitions, ordering, empty-table behavior, and numeric precision.
 - All table counts and row digests were unchanged: three users, 750 sales,
   four audit logs. Other project resources were not modified.
 
-Phase 10 — User Management and Audit API is next and has not started.
-Frontend API integration remains for a later phase.
+## Phase 10 user management and audit API
+
+See [the management API guide](server/MANAGEMENT_API.md) for safe user fields,
+role updates, audit details, and validation instructions.
+
+- Added Admin-only `GET /api/users`, `PATCH /api/users/:id/role`, and
+  `GET /api/audit-logs` with bounded list pagination.
+- Only admin/analyst/viewer roles are accepted. User responses never expose
+  password hashes. Actual role changes and their `UPDATE_ROLE` audit records
+  are committed together; unchanged roles add no audit record.
+- Syntax checks and all 46 backend tests passed. Live integration verified
+  Admin access, Analyst/Viewer rejection, role/audit updates, immediate JWT
+  permission changes, and rollback on audit failure.
+- The uniquely identified validation user was removed. Existing users, sales,
+  and prior audits remained unchanged. Final counts: three users, 750 sales,
+  seven audit logs; three role validation audits were retained.
+
+Phase 11 — Frontend Authentication Integration is next and has not started.
+The frontend still uses static sample data and a placeholder login.
 
 ## Environment configuration
 

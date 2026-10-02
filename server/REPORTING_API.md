@@ -97,8 +97,8 @@ and may be approximate for high-precision or very large amounts. The detailed
 
 Missing/invalid/expired JWTs and removed/inactive users return 401. Unsupported
 roles receive 403. Query failures return sanitized 500 responses. Only GET is
-implemented. Reports do not mutate sales, users, or audit logs. User management
-and audit-log read endpoints belong to Phase 10 and are not implemented here.
+implemented. Reports do not mutate sales, users, or audit logs. Phase 10 user
+management and audit-log reads are documented in [MANAGEMENT_API.md](MANAGEMENT_API.md).
 
 ## Phase 9 validation
 
@@ -137,5 +137,7 @@ Live validation verified:
 
 The validator prints only the error type/code on failure to avoid dumping
 SDK request metadata. API failures retain the existing sanitized responses.
-No cloud resources, IAM, or project settings were changed. Phase 9 stops here;
-Phase 10 and frontend integration have not started.
+No cloud resources, IAM, or project settings were changed during Phase 9.
+These validation results describe Phase 9 completion. Phase 10 is now
+documented in [MANAGEMENT_API.md](MANAGEMENT_API.md); frontend integration
+remains for a later phase.

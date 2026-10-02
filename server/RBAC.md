@@ -29,8 +29,9 @@ import { authorizeRoles } from './middleware/authorizeRoles.js'
 router.get('/users', authenticateToken(tokens), authorizeRoles('admin'), controller)
 ```
 
-The example demonstrates wiring for a later phase; `/api/users` has not been
-implemented. `createRoleAuthorizer(users)` allows an injected user repository
+The example demonstrates guard wiring. `/api/users` is now
+implemented in Phase 10; see [MANAGEMENT_API.md](MANAGEMENT_API.md).
+`createRoleAuthorizer(users)` allows an injected user repository
 for tests and routers. It returns the same `authorizeRoles(...allowedRoles)`
 interface. Empty or invalid allowed-role lists are configuration errors.
 
