@@ -121,8 +121,12 @@
   * {
     @apply border-border outline-ring/50;
     }
+  a:focus-visible {
+    outline: 2px solid #10b981;
+    outline-offset: 4px;
+    }
   body {
-    @apply bg-background text-foreground;
+    @apply m-0 min-w-80 bg-background text-foreground antialiased;
     }
   html {
     @apply font-sans;

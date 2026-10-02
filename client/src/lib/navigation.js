@@ -1,0 +1,52 @@
+import { ChartNoAxesCombined, LayoutDashboard, LogIn, ReceiptText, ScrollText, Users } from 'lucide-react'
+
+export const navigation = [
+  {
+    path: '/dashboard',
+    title: 'Dashboard',
+    section: 'Overview',
+    icon: LayoutDashboard,
+    description: 'A clear view of your sales performance, all in one place.',
+    placeholder: 'Sales dashboard content will appear here.',
+  },
+  {
+    path: '/transactions',
+    title: 'Transactions',
+    section: 'Workspace',
+    icon: ReceiptText,
+    description: 'Explore the sales activity behind your business.',
+    placeholder: 'Sales transactions will appear here.',
+  },
+  {
+    path: '/analytics',
+    title: 'Analytics',
+    section: 'Workspace',
+    icon: ChartNoAxesCombined,
+    description: 'Turn sales performance into useful insights.',
+    placeholder: 'Sales analytics will appear here.',
+  },
+  {
+    path: '/users',
+    title: 'Users',
+    section: 'Administration',
+    icon: Users,
+    description: 'A dedicated space for managing your team.',
+    placeholder: 'User management content will appear here.',
+  },
+  {
+    path: '/audit-logs',
+    title: 'Audit Logs',
+    section: 'Administration',
+    icon: ScrollText,
+    description: 'Keep track of activity across your workspace.',
+    placeholder: 'Audit log content will appear here.',
+  },
+  {
+    path: '/login',
+    title: 'Login',
+    section: 'Account',
+    icon: LogIn,
+    description: 'Your entry point to Sales Insight Dashboard.',
+    placeholder: 'Login content will appear here.',
+  },
+]
