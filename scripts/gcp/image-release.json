@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "projectId": "id-fpoc-0608-data-posindo",
+  "region": "asia-southeast2",
+  "repository": "sales-insight-dashboard",
+  "image": "sales-insight-dashboard",
+  "tag": "git-6653fac73558",
+  "taggedUri": "asia-southeast2-docker.pkg.dev/id-fpoc-0608-data-posindo/sales-insight-dashboard/sales-insight-dashboard:git-6653fac73558",
+  "digest": "sha256:39fb866ab65624df041ae04a7a356eef01d2f1b7492710e75b769d94234760cd",
+  "immutableUri": "asia-southeast2-docker.pkg.dev/id-fpoc-0608-data-posindo/sales-insight-dashboard/sales-insight-dashboard@sha256:39fb866ab65624df041ae04a7a356eef01d2f1b7492710e75b769d94234760cd",
+  "platform": "linux/amd64",
+  "sourceRevision": "6653fac7355821b5d6892a99b6b16db66733e007",
+  "browserTestsPassed": 31,
+  "liveBigQueryRolesValidated": [
+    "admin",
+    "analyst",
+    "viewer"
+  ],
+  "cloudRunDeployed": false
+}

@@ -1,7 +1,8 @@
 # GCP deployment preparation (Phase 17)
 
-Preparation is complete for project `id-fpoc-0608-data-posindo`
-(project number `797252500656`). No container has been pushed or deployed.
+The following preparation results record Phase 17 for project `id-fpoc-0608-data-posindo`
+(project number `797252500656`). Phase 18 image publication is now documented in
+[IMAGE_PUBLICATION.md](IMAGE_PUBLICATION.md); Cloud Run has not been deployed.
 The application region and existing BigQuery dataset location are
 `asia-southeast2` (Jakarta). Existing applications and datasets are outside
 this preparation scope.
@@ -140,7 +141,8 @@ asia-southeast2-docker.pkg.dev/id-fpoc-0608-data-posindo/sales-insight-dashboard
 ```
 
 `TAG` should identify the tested revision (for example `git-<short-commit>`).
-This is the expected path, not a pushed image. No final tag/digest exists yet.
+This was the planned path in Phase 17. The actual tag and digest are now in
+[image-release.json](image-release.json).
 The Phase 16 local image is linux/arm64; Phase 18 must build/test a linux/amd64
 image or multi-architecture image containing linux/amd64 before pushing.
 Cloud Run requires the x86_64 ABI. Do not just retag the ARM-only local image.
@@ -161,8 +163,9 @@ preparation baseline. All resource assertions and `git diff --check` passed.
 No application data, dataset ACL, existing workload, runtime service account,
 custom IAM role, secret, image push, or Cloud Run deployment was changed/created
 by this phase. The only cloud mutations were enabling the three required APIs
-and creating the dedicated repository. Phase 17 stops here; Phase 18 has not
-started.
+and creating the dedicated repository. These results record Phase 17. The tested amd64 image is now published as
+documented in [IMAGE_PUBLICATION.md](IMAGE_PUBLICATION.md); Phase 19 deployment
+has not started.
 
 Primary references:
 
