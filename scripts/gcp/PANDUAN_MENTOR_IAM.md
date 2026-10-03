@@ -1,71 +1,63 @@
-# Panduan mentor: melengkapi akses service account aplikasi
+# Panduan mentor: memberikan izin setup kepada akun developer
 
-## Tujuan dan status terakhir
+## Alur yang diminta
 
-Panduan ini hanya untuk menyiapkan IAM aplikasi Sales Insight Dashboard.
-Tidak ada langkah deployment, perubahan data, atau perubahan schema tabel.
+Mentor menggunakan akunnya sendiri untuk memberikan izin setup kepada:
 
-Project: `id-fpoc-0608-data-posindo`
+```text
+alhan.husen@point-star.com
+```
 
-Service account (SA) aplikasi:
+Developer tetap login memakai akun tersebut. Developer tidak login ke akun
+mentor/admin dan tidak membutuhkan password mentor. Setelah izin diberikan,
+developer memasang binding runtime kepada service account aplikasi:
 
 ```text
 sales-insight-runtime@id-fpoc-0608-data-posindo.iam.gserviceaccount.com
 ```
 
-Hasil pemeriksaan terakhir pada 3 Oktober 2026:
+**Dua penerima berbeda:** akun developer mendapat izin mengatur IAM resource
+aplikasi; SA mendapat izin membaca/mengubah data dan membaca JWT secret saat
+container berjalan.
 
-| Akses | Status | Tindakan |
-|---|---|---|
-| BigQuery Job User pada project | Sudah diberikan | Pertahankan; tidak perlu membuat custom role untuk query job |
-| Akses baca/tulis tiga tabel aplikasi | Binding SA belum ditemukan pada project, dataset, atau tabel | Tambahkan melalui langkah 2–3 |
-| Secret Manager Secret Accessor pada project | Sudah diberikan | Batasi ke secret aplikasi melalui langkah 4–5 |
+Project semua langkah: `id-fpoc-0608-data-posindo`.
+Panduan ini hanya menyiapkan IAM. Tidak menjalankan deployment atau mengubah data/schema.
 
-Job User memberi izin menjalankan job. Akses membaca dan mengubah isi tabel
-memerlukan permission data yang terpisah.
+## Status pemeriksaan terakhir, 3 Oktober 2026
 
-SA dan secret `sales-insight-jwt` sudah ada. Tidak perlu membuat ulang,
-membaca nilai secret, membuat key JSON, atau memberikan Owner/Editor kepada SA.
+- SA sudah mendapat `roles/bigquery.jobUser` di project. Pertahankan.
+- SA sudah mendapat `roles/secretmanager.secretAccessor` di project. Sudah
+  berfungsi, tetapi cakupannya akan dibatasi ke secret aplikasi.
+- Binding akses data SA belum ditemukan di project, dataset, atau tiga tabel.
+- SA, secret `sales-insight-jwt`, dan tiga tabel aplikasi sudah ada.
 
-## 1. Buka Cloud Shell dengan akun mentor/admin
+## Bagian A — dilakukan mentor dengan akun mentor sendiri
 
-1. Buka https://console.cloud.google.com/welcome?project=id-fpoc-0608-data-posindo.
-2. Gunakan akun Google yang berwenang mengelola IAM project ini.
-3. Klik tombol **Activate Cloud Shell** di bagian atas console.
-4. Jalankan pemeriksaan berikut:
+### 1. Buka project dan Cloud Shell
 
-```bash
-gcloud auth list --filter=status:ACTIVE --format='value(account)'
-gcloud projects describe id-fpoc-0608-data-posindo --format='value(projectId)'
-gcloud iam service-accounts describe \
-  sales-insight-runtime@id-fpoc-0608-data-posindo.iam.gserviceaccount.com \
-  --project=id-fpoc-0608-data-posindo --format='value(email)'
-```
+Buka https://console.cloud.google.com/welcome?project=id-fpoc-0608-data-posindo
+menggunakan akun mentor yang berwenang, lalu klik **Activate Cloud Shell**.
 
-Semua perintah di bawah menyebut project secara eksplisit. Tidak perlu
-mengubah default project. Panduan ini mandiri dan tidak memerlukan checkout repo.
+Semua perintah menyebut project secara eksplisit dan tidak memerlukan checkout
+repo. Jalankan setiap perintah satu per satu; berhenti jika gagal.
 
-Izin administrator yang digunakan: `iam.roles.create` untuk membuat custom
-role, `bigquery.tables.getIamPolicy` dan `bigquery.tables.setIamPolicy` pada
-tabel target, serta izin baca/ubah IAM secret dan project untuk merapikan
-binding Secret Accessor. Izin administrasi ini digunakan akun mentor,
-**bukan diberikan kepada runtime SA**. Jika perintah gagal, berhenti dan
-selesaikan error sebelum melanjutkan.
-
-## 2. Buat custom role untuk data tabel
-
-Periksa dahulu apakah role sudah ada:
+### 2. Periksa nama role sebelum membuatnya
 
 ```bash
-gcloud iam roles describe salesInsightTableData \
-  --project=id-fpoc-0608-data-posindo
+gcloud iam roles describe salesInsightTableData --project=id-fpoc-0608-data-posindo
+gcloud iam roles describe salesInsightTableIamSetup --project=id-fpoc-0608-data-posindo
+gcloud iam roles describe salesInsightSecretIamSetup --project=id-fpoc-0608-data-posindo
 ```
 
-- Jika `NOT_FOUND`, buat role dengan perintah di bawah.
-- Jika sudah ada, pastikan role milik aplikasi ini, tidak dinonaktifkan, dan
-  permission-nya persis tiga permission berikut. Jika sesuai, lewati pembuatan.
-- Jika `PERMISSION_DENIED` atau role ternyata milik workload lain, berhenti.
-  Jangan mengubah atau menimpa role tersebut.
+Untuk setiap role: jika `NOT_FOUND`, buat dengan perintah pada langkah 3.
+Jika sudah ada, periksa bahwa milik aplikasi ini, aktif, dan permission-nya
+persis sesuai definisi berikut, lalu lewati pembuatan role tersebut.
+`PERMISSION_DENIED` bukan bukti bahwa role tidak ada. Jangan menimpa role
+milik workload lain.
+
+### 3. Buat definisi role runtime dan dua role setup
+
+Role runtime berikut nanti diberikan developer kepada **SA pada tiga tabel**:
 
 ```bash
 gcloud iam roles create salesInsightTableData \
@@ -76,13 +68,90 @@ gcloud iam roles create salesInsightTableData \
   --stage=GA
 ```
 
-Role ini mengizinkan baca metadata/data dan insert, update, delete **baris**.
-Role ini tidak memberi izin menghapus tabel atau mengubah schema.
-Tidak perlu menambahkan BigQuery Admin atau BigQuery Data Editor.
+Dua role berikut diberikan kepada **akun developer**, untuk mengatur binding:
 
-## 3. Berikan role hanya pada tiga tabel aplikasi
+```bash
+gcloud iam roles create salesInsightTableIamSetup \
+  --project=id-fpoc-0608-data-posindo \
+  --title='Sales Insight Table IAM Setup' \
+  --description='Temporary IAM setup on explicitly bound application tables.' \
+  --permissions=bigquery.tables.getIamPolicy,bigquery.tables.setIamPolicy \
+  --stage=GA
+```
 
-Jalankan tiga perintah berikut satu per satu. Pastikan masing-masing berhasil:
+```bash
+gcloud iam roles create salesInsightSecretIamSetup \
+  --project=id-fpoc-0608-data-posindo \
+  --title='Sales Insight Secret IAM Setup' \
+  --description='Temporary IAM setup on the explicitly bound application secret.' \
+  --permissions=secretmanager.secrets.getIamPolicy,secretmanager.secrets.setIamPolicy \
+  --stage=GA
+```
+
+Mentor membuat definisi role sehingga developer tidak perlu diberi izin
+membuat/mengubah role seluruh project. Pembuatan definisi belum memberikan
+akses kepada siapa pun; cakupannya ditentukan oleh binding berikut.
+
+### 4. Berikan izin setup tabel kepada akun developer
+
+Jalankan setiap perintah satu per satu:
+
+```bash
+bq add-iam-policy-binding \
+  --member=user:alhan.husen@point-star.com \
+  --role=projects/id-fpoc-0608-data-posindo/roles/salesInsightTableIamSetup \
+  id-fpoc-0608-data-posindo:sales_dashboard.users
+```
+
+```bash
+bq add-iam-policy-binding \
+  --member=user:alhan.husen@point-star.com \
+  --role=projects/id-fpoc-0608-data-posindo/roles/salesInsightTableIamSetup \
+  id-fpoc-0608-data-posindo:sales_dashboard.sales
+```
+
+```bash
+bq add-iam-policy-binding \
+  --member=user:alhan.husen@point-star.com \
+  --role=projects/id-fpoc-0608-data-posindo/roles/salesInsightTableIamSetup \
+  id-fpoc-0608-data-posindo:sales_dashboard.audit_logs
+```
+
+### 5. Berikan izin setup secret kepada akun developer
+
+```bash
+gcloud secrets add-iam-policy-binding sales-insight-jwt \
+  --project=id-fpoc-0608-data-posindo \
+  --member=user:alhan.husen@point-star.com \
+  --role=projects/id-fpoc-0608-data-posindo/roles/salesInsightSecretIamSetup \
+  --condition=None
+```
+
+Izin setup dapat mengubah siapa yang mengakses resource tersebut, sehingga
+bersifat administratif. Batasi ke tiga tabel dan satu secret ini, lalu cabut
+setelah selesai. Jangan berikan dua role setup di level project/dataset.
+Tidak perlu memberikan Owner, Editor, Project IAM Admin, BigQuery Admin,
+atau Secret Manager Admin kepada developer untuk langkah ini.
+
+### 6. Konfirmasi izin setup sudah diberikan
+
+Mentor mengabari developer bahwa langkah 3–5 selesai. Developer akan mengecek
+izin memakai akunnya sendiri sebelum melanjutkan Bagian B.
+
+## Bagian B — dilakukan developer dengan akun developer sendiri
+
+### 7. Login memakai akun sendiri
+
+Di terminal lokal:
+
+```bash
+gcloud auth login alhan.husen@point-star.com
+gcloud config set account alhan.husen@point-star.com
+```
+
+Tidak perlu login ulang jika akun tersebut sudah aktif dan autentikasinya valid.
+
+### 8. Pasang role data pada SA untuk tiga tabel
 
 ```bash
 bq add-iam-policy-binding \
@@ -105,16 +174,7 @@ bq add-iam-policy-binding \
   id-fpoc-0608-data-posindo:sales_dashboard.audit_logs
 ```
 
-Jangan bind role ini di level project atau dataset. Perintah tersebut menambah
-binding pada tabel target dan mempertahankan binding milik pihak lain.
-
-## 4. Tambahkan Secret Accessor langsung pada secret aplikasi
-
-Secret Accessor yang sekarang sudah berfungsi, tetapi diberikan pada project
-sehingga cakupannya meliputi secret lain. Penerimanya tetap SA yang sama;
-yang diubah adalah cakupan resource.
-
-Tambahkan binding khusus secret **sebelum** menghapus binding project:
+### 9. Pasang Secret Accessor pada secret aplikasi untuk SA
 
 ```bash
 gcloud secrets add-iam-policy-binding sales-insight-jwt \
@@ -124,21 +184,27 @@ gcloud secrets add-iam-policy-binding sales-insight-jwt \
   --condition=None
 ```
 
-Verifikasi binding tersebut dan versi secret tanpa membaca nilainya:
+### 10. Verifikasi binding, lalu beri konfirmasi kepada mentor
 
 ```bash
-gcloud secrets get-iam-policy sales-insight-jwt \
-  --project=id-fpoc-0608-data-posindo
-gcloud secrets versions list sales-insight-jwt \
-  --project=id-fpoc-0608-data-posindo
+bq get-iam-policy id-fpoc-0608-data-posindo:sales_dashboard.users
+bq get-iam-policy id-fpoc-0608-data-posindo:sales_dashboard.sales
+bq get-iam-policy id-fpoc-0608-data-posindo:sales_dashboard.audit_logs
+gcloud secrets get-iam-policy sales-insight-jwt --project=id-fpoc-0608-data-posindo
 ```
 
-Pastikan role `roles/secretmanager.secretAccessor` memuat SA aplikasi dan
-versi `1` berstatus `ENABLED`. Jika belum, jangan lanjut ke langkah 5.
+Pastikan SA memiliki `salesInsightTableData` di ketiga tabel dan
+`roles/secretmanager.secretAccessor` pada secret. Jangan membaca/mengirim nilai
+secret, token, atau key JSON. Ini memverifikasi konfigurasi binding; query runtime,
+login, dan RBAC tetap perlu diuji saat deployment nanti.
 
-## 5. Hapus hanya binding Secret Accessor SA aplikasi di project
+## Bagian C — perapihan oleh mentor setelah Bagian B berhasil
 
-Setelah langkah 4 terverifikasi, jalankan:
+### 11. Hapus binding Secret Accessor SA di level project
+
+Developer tidak diberi `resourcemanager.projects.setIamPolicy`, karena izin
+tersebut dapat mengubah akses seluruh project. Oleh sebab itu, mentor melakukan
+satu perapihan project berikut setelah binding secret pada langkah 9–10 berhasil:
 
 ```bash
 gcloud projects remove-iam-policy-binding id-fpoc-0608-data-posindo \
@@ -147,54 +213,69 @@ gcloud projects remove-iam-policy-binding id-fpoc-0608-data-posindo \
   --condition=None
 ```
 
-Ini hanya menghapus binding tanpa kondisi untuk pasangan SA/role tersebut di
-project. Jangan hapus BigQuery Job User, binding secret yang baru ditambahkan,
-atau binding akun lain. Jangan menggunakan `set-iam-policy` untuk mengganti
-seluruh policy project. Jika hasil pemeriksaan menunjukkan binding dengan
-kondisi berbeda, evaluasi dahulu; jangan menghapus binding lain secara massal.
+Hapus hanya binding tanpa kondisi pasangan SA/role tersebut. Pertahankan
+BigQuery Job User dan binding secret. Jika policy telah berubah atau binding
+memiliki kondisi berbeda, periksa dahulu; jangan menghapus binding lain.
 
-## 6. Verifikasi hasil akhir
+### 12. Cabut dua role setup sementara dari akun developer
 
 ```bash
-gcloud iam roles describe salesInsightTableData \
-  --project=id-fpoc-0608-data-posindo
+bq remove-iam-policy-binding \
+  --member=user:alhan.husen@point-star.com \
+  --role=projects/id-fpoc-0608-data-posindo/roles/salesInsightTableIamSetup \
+  id-fpoc-0608-data-posindo:sales_dashboard.users
+```
 
-bq get-iam-policy id-fpoc-0608-data-posindo:sales_dashboard.users
-bq get-iam-policy id-fpoc-0608-data-posindo:sales_dashboard.sales
-bq get-iam-policy id-fpoc-0608-data-posindo:sales_dashboard.audit_logs
+```bash
+bq remove-iam-policy-binding \
+  --member=user:alhan.husen@point-star.com \
+  --role=projects/id-fpoc-0608-data-posindo/roles/salesInsightTableIamSetup \
+  id-fpoc-0608-data-posindo:sales_dashboard.sales
+```
 
+```bash
+bq remove-iam-policy-binding \
+  --member=user:alhan.husen@point-star.com \
+  --role=projects/id-fpoc-0608-data-posindo/roles/salesInsightTableIamSetup \
+  id-fpoc-0608-data-posindo:sales_dashboard.audit_logs
+```
+
+```bash
+gcloud secrets remove-iam-policy-binding sales-insight-jwt \
+  --project=id-fpoc-0608-data-posindo \
+  --member=user:alhan.husen@point-star.com \
+  --role=projects/id-fpoc-0608-data-posindo/roles/salesInsightSecretIamSetup \
+  --condition=None
+```
+
+Jangan cabut role runtime milik SA atau izin developer yang sudah ada sebelumnya.
+Pencabutan ini hanya menghapus binding setup baru; tidak menghilangkan izin
+serupa jika sudah diperoleh developer dari role lain.
+
+### 13. Verifikasi hasil akhir
+
+```bash
 gcloud projects get-iam-policy id-fpoc-0608-data-posindo \
   --flatten='bindings[].members' \
   --filter='bindings.members:serviceAccount:sales-insight-runtime@id-fpoc-0608-data-posindo.iam.gserviceaccount.com' \
   --format='table(bindings.role,bindings.members)'
-
-gcloud secrets get-iam-policy sales-insight-jwt \
-  --project=id-fpoc-0608-data-posindo
+bq get-iam-policy id-fpoc-0608-data-posindo:sales_dashboard.users
+bq get-iam-policy id-fpoc-0608-data-posindo:sales_dashboard.sales
+bq get-iam-policy id-fpoc-0608-data-posindo:sales_dashboard.audit_logs
+gcloud secrets get-iam-policy sales-insight-jwt --project=id-fpoc-0608-data-posindo
 ```
 
-Hasil yang diharapkan:
+Hasil akhir: SA tetap memiliki Job User di project, akses data di tiga tabel,
+dan akses secret pada `sales-insight-jwt`. Binding setup sementara developer
+sudah dicabut, binding Secret Accessor SA di project sudah dihapus, dan tidak
+ada IAM/data/schema workload lain yang diubah. Akses tambahan dari folder atau
+organisasi perlu diperiksa terpisah jika ada.
 
-- Ketiga tabel memiliki binding `salesInsightTableData` untuk SA aplikasi.
-- Role custom hanya memuat tiga permission pada langkah 2.
-- BigQuery Job User tetap ada pada project untuk SA aplikasi.
-- Secret Accessor ada pada secret `sales-insight-jwt` untuk SA aplikasi.
-- Secret Accessor milik SA tersebut tidak lagi ada di policy project.
-- Tidak ada perubahan data, schema, dataset ACL, atau IAM workload lain.
-
-Jika ada akses tambahan yang diwariskan dari folder/organisasi, pemeriksaan
-policy project saja tidak membuktikan bahwa akses itu telah hilang. Evaluasi
-terpisah sebelum menyimpulkan seluruh akses secret sudah terbatas.
-
-## 7. Konfirmasi selesai kepada developer
-
-Kirim konfirmasi bahwa binding sudah diterapkan, beserta output pemeriksaan
-role/binding yang relevan. Jangan kirim token, password, key JSON, atau nilai secret.
-Developer akan mengecek ulang sebelum melanjutkan Phase 19. Panduan ini tidak
-menjalankan deployment Cloud Run atau mengubah pilihan akses privat.
+**Berhenti di sini.** Developer melaporkan hasil pemeriksaan sebelum melanjutkan
+Phase 19 sesuai permintaan pengguna. Pilihan Cloud Run tetap privat.
 
 ## Referensi resmi
 
-- [BigQuery IAM dan binding per tabel](https://docs.cloud.google.com/bigquery/docs/control-access-to-resources-iam)
-- [Permission BigQuery](https://docs.cloud.google.com/bigquery/docs/access-control)
-- [Cakupan akses Secret Manager](https://docs.cloud.google.com/secret-manager/docs/access-control)
-- [Menghapus binding project secara spesifik](https://docs.cloud.google.com/sdk/gcloud/reference/projects/remove-iam-policy-binding)
+- [Custom IAM roles](https://docs.cloud.google.com/iam/docs/creating-custom-roles)
+- [IAM per tabel BigQuery](https://docs.cloud.google.com/bigquery/docs/control-access-to-resources-iam)
+- [IAM Secret Manager](https://docs.cloud.google.com/secret-manager/docs/access-control)
