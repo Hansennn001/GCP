@@ -3,15 +3,15 @@
 A proof-of-concept sales analytics dashboard planned with React, Express,
 JWT authentication, role-based access control, and Google BigQuery. A Docker
 image packages the application and has been validated locally. GCP
-preparation and image publication are complete; private Cloud Run deployment
-is awaiting administrator IAM setup.
+preparation, image publication, and private Cloud Run deployment are complete.
 
 ## Current status
 
-Phase 18 — Build and Push Container Image is complete. Phase 19 is in progress
-and blocked on administrator IAM permissions. The dedicated runtime service
-account and JWT secret exist; Cloud Run has not been deployed. See the
-[administrator handoff](scripts/gcp/PHASE19_IAM_SETUP.md).
+Phase 19 — Deploy Container to Cloud Run is complete. The private service is
+healthy and uses the dedicated runtime SA and Secret Manager JWT reference.
+Real BigQuery login, APIs, and RBAC pass for Admin/Analyst/Viewer; all 31 browser
+tests pass. See [deployment and private browser access](scripts/gcp/CLOUD_RUN_DEPLOYMENT.md).
+Phase 20 has not started.
 The tested linux/amd64
 image is published in the dedicated Artifact Registry repository. A
 least-privilege runtime IAM strategy is documented. The production container
@@ -23,7 +23,7 @@ backed by BigQuery. The application dataset contains three demo users,
 page access, and actions follow the signed-in user's role. Admin/Analyst can
 create transactions; Admin can confirm deletion and update user roles.
 Loading, empty, error/retry, pagination, and mutation refresh states are available.
-Private Cloud Run deployment awaits the IAM setup described above. See
+Cloud Run is deployed with private IAM access. See
 [production startup](server/PRODUCTION.md),
 [container build](server/CONTAINER_IMAGE.md), and
 [local Docker startup and validation](scripts/docker/LOCAL_DOCKER.md), and
@@ -513,21 +513,38 @@ temporary credentials were cleaned up.
 
 Phase 18 is complete. Phase 19 preparation is recorded below; Cloud Run is not deployed.
 
-## Phase 19 private deployment preparation
+## Phase 19 private Cloud Run deployment
 
-Created the dedicated `sales-insight-runtime` service account and
-`sales-insight-jwt` secret with enabled version `1`. No secret value was saved
-in the repository or printed. The selected Cloud Run access is private.
+Deployed the tested Artifact Registry container by immutable digest to
+`sales-insight-dashboard` in `asia-southeast2`. Ready revision
+`sales-insight-dashboard-00001-hxz` serves 100% of traffic. Cloud Run uses the
+`sales-insight-runtime` SA, port 8080, the app's BigQuery configuration, and
+Secret Manager reference `sales-insight-jwt:1`.
 
-Custom-role creation failed because the current account lacks `iam.roles.create`.
-Permission checks also found project, secret, and Cloud Run IAM-policy writes
-unavailable. No runtime IAM binding or Cloud Run deployment was applied.
-Existing table data, schemas, dataset ACLs, and workloads were not changed.
+[Service URL](https://sales-insight-dashboard-797252500656.asia-southeast2.run.app)
+requires Google IAM authentication. For browser access, run:
 
-The [administrator handoff and prepared deployment command](scripts/gcp/PHASE19_IAM_SETUP.md)
-scope runtime permissions to query-job submission, the three application tables,
-and the dedicated JWT secret. Administrator setup must finish before deployment
-and live Cloud Run validation. Phase 19 acceptance criteria remain pending;
+```bash
+gcloud run services proxy sales-insight-dashboard \
+  --project=id-fpoc-0608-data-posindo --region=asia-southeast2 --port=8081
+```
+
+Then open http://127.0.0.1:8081/login and log in with the app credentials.
+The authenticated proxy was tested with real login and preserves the app JWT.
+
+Unauthenticated requests are denied; authenticated health, React routes, real
+BigQuery login/APIs, and 24 RBAC probes pass. All 31 browser fixture tests also
+pass against the deployed container. Counts/full-row digests are unchanged:
+three users, 750 sales, 13 audit logs. No production data mutations were tested
+in this phase. The dataset ACL and other workloads were not modified.
+
+Mentor granted runtime Job User, Data Editor, and Secret Accessor at project
+scope. Those grants were retained and are broader than the original scoped IAM
+plan; narrowing them remains an administrator action. No deployment IAM binding
+was added. Historical setup guides describe the earlier proposed handoff.
+
+See [commands and validation results](scripts/gcp/CLOUD_RUN_DEPLOYMENT.md) and
+[release metadata](scripts/gcp/cloud-run-release.json). Phase 19 is complete;
 Phase 20 has not started.
 
 ## Environment configuration

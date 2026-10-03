@@ -1,5 +1,10 @@
 # Phase 19: private Cloud Run preparation and administrator handoff
 
+> Historical IAM preparation guide. Phase 19 is now complete using the runtime
+> roles granted by the mentor at project scope. This guide was not executed as
+> a complete setup workflow. Current deployment and IAM scope are documented in
+> [CLOUD_RUN_DEPLOYMENT.md](CLOUD_RUN_DEPLOYMENT.md).
+
 Phase 19 is **incomplete**. No Cloud Run service or revision has been deployed.
 The user selected private access: keep invoker IAM checks enabled and do not
 grant `allUsers` or `allAuthenticatedUsers` access.

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "projectId": "id-fpoc-0608-data-posindo",
+  "region": "asia-southeast2",
+  "service": "sales-insight-dashboard",
+  "url": "https://sales-insight-dashboard-gi6r3sbeka-et.a.run.app",
+  "canonicalUrl": "https://sales-insight-dashboard-797252500656.asia-southeast2.run.app",
+  "revision": "sales-insight-dashboard-00001-hxz",
+  "deployedImage": "asia-southeast2-docker.pkg.dev/id-fpoc-0608-data-posindo/sales-insight-dashboard/sales-insight-dashboard@sha256:39fb866ab65624df041ae04a7a356eef01d2f1b7492710e75b769d94234760cd",
+  "resolvedAmd64Digest": "sha256:58ed55b50a895df9dd57c857ac2f46cbe488fa6673772c04d7aba0cf6930ad2c",
+  "runtimeServiceAccount": "sales-insight-runtime@id-fpoc-0608-data-posindo.iam.gserviceaccount.com",
+  "access": "private-iam",
+  "secretReference": "sales-insight-jwt:1",
+  "validatedOn": "2026-10-03",
+  "fixtureBrowserTestsPassed": 31,
+  "liveRolesValidated": [
+    "admin",
+    "analyst",
+    "viewer"
+  ],
+  "readOnlyRbacProbesPassed": 24,
+  "tableCountsUnchanged": {
+    "users": 3,
+    "sales": 750,
+    "audit_logs": 13
+  },
+  "tableDigestsUnchanged": true,
+  "runtimeIamScope": "mentor-granted-project-level-jobUser-dataEditor-secretAccessor",
+  "phase20Started": false
+}

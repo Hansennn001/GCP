@@ -16,5 +16,5 @@
     "analyst",
     "viewer"
   ],
-  "cloudRunDeployed": false
+  "cloudRunDeployed": true
 }

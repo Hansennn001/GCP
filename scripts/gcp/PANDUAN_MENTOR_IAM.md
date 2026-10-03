@@ -1,5 +1,10 @@
 # Panduan mentor: memberikan izin setup kepada akun developer
 
+> Historical IAM preparation guide. Phase 19 is now complete using the runtime
+> roles granted by the mentor at project scope. This guide was not executed as
+> a complete setup workflow. Current deployment and IAM scope are documented in
+> [CLOUD_RUN_DEPLOYMENT.md](CLOUD_RUN_DEPLOYMENT.md).
+
 ## Alur yang diminta
 
 Mentor menggunakan akunnya sendiri untuk memberikan izin setup kepada:

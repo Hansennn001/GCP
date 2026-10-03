@@ -1,5 +1,10 @@
 # GCP deployment preparation (Phase 17)
 
+> Historical IAM preparation guide. Phase 19 is now complete using the runtime
+> roles granted by the mentor at project scope. This guide was not executed as
+> a complete setup workflow. Current deployment and IAM scope are documented in
+> [CLOUD_RUN_DEPLOYMENT.md](CLOUD_RUN_DEPLOYMENT.md).
+
 The following preparation results record Phase 17 for project `id-fpoc-0608-data-posindo`
 (project number `797252500656`). Phase 18 image publication is now documented in
 [IMAGE_PUBLICATION.md](IMAGE_PUBLICATION.md); Cloud Run has not been deployed.
