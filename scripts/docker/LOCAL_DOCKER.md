@@ -2,8 +2,8 @@
 
 The existing `sales-insight-dashboard:latest` image now runs locally with
 real BigQuery authentication. No cloud deployment or GCP resource preparation
-is performed by these commands. Image construction is documented in
-[CONTAINER_IMAGE.md](../../server/CONTAINER_IMAGE.md).
+is performed by these commands. Image construction is documented in the root
+[README](../../README.md#production-and-docker).
 
 ## Run
 
@@ -139,6 +139,5 @@ Additional inline Node/Python checks verified:
   copies were confirmed removed. The reusable image remains available locally.
 
 These historical results validate the local linux/arm64 image. The tested amd64
-image is published as documented in [IMAGE_PUBLICATION.md](../gcp/IMAGE_PUBLICATION.md)
-and deployed to private Cloud Run. See [cloud deployment](../gcp/CLOUD_RUN_DEPLOYMENT.md)
+image is published and deployed to private Cloud Run. See [cloud deployment](../gcp/CLOUD_RUN_DEPLOYMENT.md)
 and [final verification](../gcp/FINAL_VERIFICATION.md) for the current release.

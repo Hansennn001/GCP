@@ -1,6 +1,8 @@
 # Phase 19 — private Cloud Run container deployment
 
-Phase 19 is complete. Phase 20 has not started.
+Container deployment and final verification are complete. This guide records
+the deployed release; see [FINAL_VERIFICATION.md](FINAL_VERIFICATION.md) for
+final results and limitations.
 
 ## Deployed service
 
@@ -26,6 +28,46 @@ its linux/amd64 runtime manifest to
 `sha256:58ed55b50a895df9dd57c857ac2f46cbe488fa6673772c04d7aba0cf6930ad2c`,
 which matches the index descriptor verified with `docker buildx imagetools inspect`.
 The other index descriptor is BuildKit provenance, not a runtime image.
+
+## Publish a future container image
+
+The original image was built from source revision
+`6653fac7355821b5d6892a99b6b16db66733e007`. Its tag and immutable digest are in
+[image-release.json](image-release.json). Use a new tag for future releases;
+do not overwrite the tested release tag.
+
+From the repository root, authenticate Docker and build an amd64 image:
+
+```bash
+gcloud auth configure-docker asia-southeast2-docker.pkg.dev
+RELEASE_TAG="git-$(git rev-parse --short HEAD)"
+docker buildx build --platform linux/amd64 --load \
+  -t "sales-insight-dashboard:${RELEASE_TAG}" .
+```
+
+Validate that local image before publishing it. In one terminal, run:
+
+```bash
+LOCAL_DOCKER_IMAGE="sales-insight-dashboard:${RELEASE_TAG}" \
+LOCAL_DOCKER_PLATFORM=linux/amd64 node scripts/docker/run-local.mjs
+```
+
+In another terminal, run `npm run test:docker --prefix client`. Stop the local
+runner after validation. Back in the original shell, publish the same image:
+
+```bash
+REGISTRY_IMAGE="asia-southeast2-docker.pkg.dev/id-fpoc-0608-data-posindo/sales-insight-dashboard/sales-insight-dashboard:${RELEASE_TAG}"
+docker tag "sales-insight-dashboard:${RELEASE_TAG}" "$REGISTRY_IMAGE"
+docker push "$REGISTRY_IMAGE"
+docker buildx imagetools inspect "$REGISTRY_IMAGE"
+```
+
+Record the returned immutable digest and use that digest for a future deployment.
+The deployment command below records the existing release; it will redeploy
+that original image unless its image URI is explicitly updated. Publication
+requires repository write permission; deployment requires appropriate Cloud Run
+permissions and permission to act as the runtime SA. These commands have not
+been rerun as part of documentation cleanup.
 
 ## Command executed
 

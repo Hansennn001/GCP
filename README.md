@@ -207,8 +207,8 @@ npm run build --prefix client
 NODE_ENV=production npm start --prefix server
 ```
 
-Open http://127.0.0.1:8080/login. No Vite process is required. See
-[production server behavior](server/PRODUCTION.md).
+Open http://127.0.0.1:8080/login. No Vite process is required. Express supports direct navigation and refresh on
+React routes; API failures and missing assets retain their own error responses.
 
 To build and run a local container:
 
@@ -221,8 +221,8 @@ The runner uses the configured application dataset, mounts temporary local ADC
 and runtime configuration, and binds to loopback. Keep it running while using
 http://127.0.0.1:8080/login. Ctrl+C removes its container and temporary files.
 Docker runs the app as the non-root `node` user. Credentials are not baked into
-the image. See [container build](server/CONTAINER_IMAGE.md) and
-[Docker configuration](scripts/docker/LOCAL_DOCKER.md).
+the image. See [Docker configuration](scripts/docker/LOCAL_DOCKER.md) for runtime
+mounts, image/platform selection, and cleanup details.
 
 ## Cloud Run deployment and access
 
@@ -249,9 +249,8 @@ Stop the proxy with Ctrl+C when finished.
 The release uses an immutable linux/amd64 image from Artifact Registry and
 Secret Manager reference `sales-insight-jwt:1`. Cloud Run accesses BigQuery via
 `sales-insight-runtime@id-fpoc-0608-data-posindo.iam.gserviceaccount.com`.
-See [deployment commands and validation](scripts/gcp/CLOUD_RUN_DEPLOYMENT.md),
-[image publication](scripts/gcp/IMAGE_PUBLICATION.md), and
-[release metadata](scripts/gcp/cloud-run-release.json).
+See [image publication, deployment, and validation](scripts/gcp/CLOUD_RUN_DEPLOYMENT.md)
+and [release metadata](scripts/gcp/cloud-run-release.json).
 
 ## API reference
 
@@ -279,9 +278,11 @@ default 0). Sales input includes `sale_date`, `product`, `category`, `region`,
 `quantity`, `revenue`, and `cost`; use decimal strings for amounts. Role changes
 accept a body such as `{ "role": "analyst" }`.
 
-Detailed contracts: [authentication](server/AUTHENTICATION.md),
-[sales](server/SALES_API.md), [reporting](server/REPORTING_API.md), and
-[user management/audit](server/MANAGEMENT_API.md).
+Login accepts `{ "email": "...", "password": "..." }` and returns the app
+JWT plus a public user record. Create returns HTTP 201, successful delete returns
+204, and missing records return 404. Authentication failures return 401;
+forbidden role actions return 403. Invalid input returns 400. API errors use
+`{ "success": false, "message": "..." }` without database or credential details.
 
 ## Testing
 
