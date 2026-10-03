@@ -1,34 +1,56 @@
 # Sales Insight Dashboard
 
-A proof-of-concept sales analytics dashboard planned with React, Express,
+A proof-of-concept sales analytics dashboard built with React, Express,
 JWT authentication, role-based access control, and Google BigQuery. A Docker
 image packages the application and has been validated locally. GCP
 preparation, image publication, and private Cloud Run deployment are complete.
 
 ## Current status
 
-Phase 19 — Deploy Container to Cloud Run is complete. The private service is
-healthy and uses the dedicated runtime SA and Secret Manager JWT reference.
-Real BigQuery login, APIs, and RBAC pass for Admin/Analyst/Viewer; all 31 browser
-tests pass. See [deployment and private browser access](scripts/gcp/CLOUD_RUN_DEPLOYMENT.md).
-Phase 20 has not started.
-The tested linux/amd64
-image is published in the dedicated Artifact Registry repository. A
-least-privilege runtime IAM strategy is documented. The production container
-serves React and APIs with real BigQuery login and RBAC. Express serves both `/api/*` and the React production build with direct-route refresh
-support. Dashboard, Transactions, Analytics, Users, and Audit Logs load
-through Express APIs
-backed by BigQuery. The application dataset contains three demo users,
-750 sales records, and 13 audit logs after validation. Login, session checks,
-page access, and actions follow the signed-in user's role. Admin/Analyst can
-create transactions; Admin can confirm deletion and update user roles.
-Loading, empty, error/retry, pagination, and mutation refresh states are available.
-Cloud Run is deployed with private IAM access. See
-[production startup](server/PRODUCTION.md),
-[container build](server/CONTAINER_IMAGE.md), and
-[local Docker startup and validation](scripts/docker/LOCAL_DOCKER.md), and
-[GCP preparation](scripts/gcp/DEPLOYMENT_PREPARATION.md), and
-[published image details](scripts/gcp/IMAGE_PUBLICATION.md).
+Phase 20 — Final Verification and Documentation is complete. The private Cloud
+Run service is healthy. Real BigQuery reads/writes, JWT/session checks, and RBAC
+pass for Admin, Analyst, and Viewer. Final checks include 54 backend tests,
+31 browser tests, client lint/build, and local Docker smoke validation.
+
+The dataset contains **3 users, 750 sales, and 19 audit logs**. Temporary test
+sales were deleted and the Viewer role was restored; the six new audit records
+are retained. Runtime IAM is currently granted at project scope by the mentor,
+broader than the original scoped plan.
+
+See [final results and limitations](scripts/gcp/FINAL_VERIFICATION.md) and
+[deployment/private browser access](scripts/gcp/CLOUD_RUN_DEPLOYMENT.md).
+Historical phase results below retain the data counts recorded at that time.
+
+## Architecture and tech stack
+
+```mermaid
+flowchart LR
+  Browser[React browser app] -->|same-origin API and app JWT| Express[Express API + React build]
+  Express -->|runtime SA / ADC| BQ[BigQuery: users, sales, audit_logs]
+  Secret[Secret Manager: JWT secret] --> Express
+  Registry[Artifact Registry: immutable amd64 image] --> Run[Private Cloud Run container]
+  Run --> Express
+```
+
+React 19, Vite 8, React Router, Tailwind CSS, and Recharts provide the UI.
+Express 5 uses bcrypt, one-hour JWTs, current-user RBAC, Helmet, and the Google
+BigQuery SDK. Node 24 runs in a multi-stage Docker image as a non-root user.
+Cloud Run uses its attached SA for BigQuery and reads JWT_SECRET from Secret
+Manager. Google IAM authentication protects the service before app login.
+
+## Role permissions
+
+| Action | Viewer | Analyst | Admin |
+|---|---|---|---|
+| View dashboard, transactions, analytics | Yes | Yes | Yes |
+| Create sales | No | Yes | Yes |
+| Delete sales | No | No | Yes |
+| List users / change roles | No | No | Yes |
+| View audit logs | No | No | Yes |
+
+Backend guards check the current active BigQuery user on each protected request.
+Changing roles affects existing sessions; frontend visibility is not the security
+boundary. Password hashes and JWT secrets are never exposed in API responses.
 
 ## Repository structure
 
@@ -128,6 +150,91 @@ npm test
 `check` validates application JavaScript syntax. The tests use Node's
 built-in test runner and temporary local HTTP listeners, so they do not
 require a running server, database, or Google Cloud credentials.
+
+## BigQuery setup
+
+Local SDK access uses Application Default Credentials, separate from CLI login:
+
+```bash
+gcloud auth application-default login
+gcloud auth application-default set-quota-project id-fpoc-0608-data-posindo
+```
+
+Copy `.env.example` to an ignored root `.env` and configure the variables listed
+under Environment configuration. Existing app resources use project
+`id-fpoc-0608-data-posindo`, dataset `sales_dashboard`, location `asia-southeast2`.
+The three tables are `users`, `sales`, and `audit_logs`. See
+[dataset/table setup](scripts/bigquery/README.md) and
+[demo seed/credential instructions](scripts/bigquery/SEEDING.md).
+Resources are already created and seeded in this project; do not repeat setup
+or reseed for ordinary startup. New environments should follow those guides
+with their own explicit resource boundaries.
+
+## Docker build and run
+
+From the repository root with Docker running:
+
+```bash
+docker build -t sales-insight-dashboard .
+node scripts/docker/run-local.mjs
+```
+
+Open http://127.0.0.1:8080/login. The runner supplies local ADC/configuration
+through temporary runtime files and cleans up its own container on Ctrl+C.
+See [Docker build details](server/CONTAINER_IMAGE.md) and
+[local Docker configuration](scripts/docker/LOCAL_DOCKER.md).
+Cloud Run uses the separately published linux/amd64 image; deployed settings
+and immutable URI are in [the deployment guide](scripts/gcp/CLOUD_RUN_DEPLOYMENT.md).
+
+## API summary
+
+All paths are under `/api`. Protected endpoints require `Authorization: Bearer`
+with an app JWT. Direct private Cloud Run requests also need Google IAM
+authentication, using `X-Serverless-Authorization` for the Google ID token.
+
+| Method / path | Access | Purpose |
+|---|---|---|
+| GET `/health` | No app JWT | Health; Cloud Run IAM still applies |
+| POST `/auth/login` | No app JWT | Login with email/password |
+| GET `/auth/me` | Any active role | Current user/session |
+| GET `/dashboard/summary`, `/dashboard/revenue-trend` | All roles | Dashboard reports |
+| GET `/analytics/products`, `/analytics/regions`, `/analytics/top-products` | All roles | Analytics reports |
+| GET `/sales` | All roles | Paginated sales |
+| POST `/sales` | Admin, Analyst | Create sale and audit |
+| DELETE `/sales/:id` | Admin | Delete sale and audit |
+| GET `/users` | Admin | Paginated public user records |
+| PATCH `/users/:id/role` | Admin | Change role and audit |
+| GET `/audit-logs` | Admin | Paginated audit records |
+| GET `/access/:permission` | Permission-dependent | Read-only RBAC probes |
+
+Sales input: `sale_date`, `product`, `category`, `region`, `quantity`, `revenue`,
+`cost`. Use decimal strings for monetary amounts. Role updates accept
+`{ "role": "analyst" }`, with role set to `admin`, `analyst`, or `viewer`. List endpoints accept `limit`
+(1–100, default 50) and `offset` (0–1,000,000, default 0).
+
+## Final verification
+
+```bash
+npm run check --prefix server
+npm test --prefix server
+npm run lint --prefix client
+npm run build --prefix client
+node scripts/gcp/validate-cloud-run.mjs
+```
+
+The Cloud Run validator requires authenticated CLI tools, Playwright Chromium,
+and demo credentials in macOS Keychain. It performs read-only live checks and
+31 browser fixture tests. To explicitly repeat the live mutation verification:
+
+```bash
+node scripts/gcp/verify-final.mjs --run-demo-writes
+```
+
+That command creates/deletes two temporary demo sales and changes/restores the
+Viewer role. It intentionally retains six audit records per successful run.
+Only run it in the existing app-owned demo environment. See
+[final verification report](scripts/gcp/FINAL_VERIFICATION.md) for evidence,
+cleanup, architecture, and known limitations.
 
 ## Backend foundation
 
@@ -545,7 +652,7 @@ was added. Historical setup guides describe the earlier proposed handoff.
 
 See [commands and validation results](scripts/gcp/CLOUD_RUN_DEPLOYMENT.md) and
 [release metadata](scripts/gcp/cloud-run-release.json). Phase 19 is complete;
-Phase 20 has not started.
+Phase 20 final results are documented above.
 
 ## Environment configuration
 
@@ -565,5 +672,5 @@ for token issuance and verification; the example value must be replaced.
 The health endpoint does not require BigQuery configuration or credentials.
 
 Keep real secrets, passwords, and Google Cloud credentials out of the
-repository. Prefer Application Default Credentials for local Google Cloud
-authentication when BigQuery integration is implemented.
+repository. Use Application Default Credentials for local Google Cloud authentication;
+Cloud Run uses its attached runtime service account.

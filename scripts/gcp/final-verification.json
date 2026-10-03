@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "phase": 20,
+  "status": "complete",
+  "verifiedOn": "2026-10-03",
+  "projectId": "id-fpoc-0608-data-posindo",
+  "region": "asia-southeast2",
+  "service": "sales-insight-dashboard",
+  "revision": "sales-insight-dashboard-00001-hxz",
+  "privateAccessVerified": true,
+  "backendTestsPassed": 54,
+  "browserFixtureTestsPassed": 31,
+  "liveRoleMatrixVerified": [
+    "viewer",
+    "analyst",
+    "admin"
+  ],
+  "readOnlyRbacProbesPassed": 24,
+  "liveWriteVerification": {
+    "adminCreate": true,
+    "analystCreate": true,
+    "viewerCreateDenied": true,
+    "adminDelete": true,
+    "analystViewerDeleteDenied": true,
+    "adminUserRoleChange": true,
+    "analystViewerUserManagementDenied": true,
+    "adminAuditRead": true,
+    "analystViewerAuditReadDenied": true,
+    "staleJwtRoleRevalidated": true
+  },
+  "cleanup": {
+    "temporarySalesRemoved": true,
+    "viewerRoleRestored": true,
+    "usersSalesDigestsUnchanged": true,
+    "originalAuditRecordsUnchanged": true,
+    "auditRecordsAdded": 6
+  },
+  "tableCounts": {
+    "users": 3,
+    "sales": 750,
+    "audit_logs": 19
+  },
+  "checks": {
+    "clientLint": "passed",
+    "clientBuild": "passed",
+    "serverSyntax": "passed",
+    "dockerAmd64Smoke": "passed",
+    "artifactManifest": "passed",
+    "cloudRunHealth": "passed",
+    "datasetAclUnchanged": true
+  },
+  "runtimeIamScope": "mentor-granted-project-level-jobUser-dataEditor-secretAccessor",
+  "runtimeImageChanged": false
+}
