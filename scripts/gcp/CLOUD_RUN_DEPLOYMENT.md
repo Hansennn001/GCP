@@ -76,7 +76,15 @@ preservation, and browser dashboard were tested successfully. The validation
 proxy was stopped afterward.
 
 For direct automated requests, `X-Serverless-Authorization` carries the Google
-ID token, leaving `Authorization` for the app JWT. Neither token is saved/logged.
+ID token, leaving `Authorization` for the app JWT. The automated validator does
+not save or print these tokens.
+
+During proxy cleanup, a process-list diagnostic inadvertently displayed the
+proxy's temporary Google ID token in tool output because the SDK passes it as a
+process argument. It was not written to files or Git. The proxy and its parent
+were stopped, and port 8081 was confirmed closed. Stopping the proxy does not
+invalidate an issued token; that token remains valid until its expiry. Avoid
+printing full process arguments when inspecting this proxy in future.
 
 ## Validation executed and results
 
