@@ -1,9 +1,8 @@
 # Build and publish container image (Phase 18)
 
-The tested production image is now present in the dedicated Artifact Registry
-repository. **It has not been deployed to Cloud Run.** Runtime service-account,
-IAM, and JWT-secret setup from [DEPLOYMENT_PREPARATION.md](DEPLOYMENT_PREPARATION.md)
-remain required before deployment.
+The tested production image is published in Artifact Registry and deployed to
+private Cloud Run. This guide records the original publication workflow;
+current service configuration is in [CLOUD_RUN_DEPLOYMENT.md](CLOUD_RUN_DEPLOYMENT.md).
 
 ## Exact published image
 
@@ -13,7 +12,7 @@ Tag URI:
 asia-southeast2-docker.pkg.dev/id-fpoc-0608-data-posindo/sales-insight-dashboard/sales-insight-dashboard:git-6653fac73558
 ```
 
-Immutable URI to use for the later deployment:
+Published immutable image URI:
 
 ```text
 asia-southeast2-docker.pkg.dev/id-fpoc-0608-data-posindo/sales-insight-dashboard/sales-insight-dashboard@sha256:39fb866ab65624df041ae04a7a356eef01d2f1b7492710e75b769d94234760cd
@@ -21,7 +20,8 @@ asia-southeast2-docker.pkg.dev/id-fpoc-0608-data-posindo/sales-insight-dashboard
 
 The build source revision is `6653fac7355821b5d6892a99b6b16db66733e007`.
 Subsequent commits change the host validation helper and documentation, not
-application/image build inputs. Machine-readable release metadata is in
+the contents of the published image. Later cleanup removes an unused placeholder
+component; this does not change the already deployed image. Machine-readable release metadata is in
 [image-release.json](image-release.json). The image remains configured for
 non-root execution, `NODE_ENV=production`, and default port 8080.
 
@@ -127,5 +127,6 @@ Results:
   existing containers, workloads, datasets, IAM, and project settings were
   not changed. The image remains locally and in the dedicated registry.
 
-Phase 18 is complete. Phase 19 deployment has not started; there is no
-Cloud Run application URL yet.
+Publication is complete. The image is deployed; see
+[CLOUD_RUN_DEPLOYMENT.md](CLOUD_RUN_DEPLOYMENT.md) for private access and
+[FINAL_VERIFICATION.md](FINAL_VERIFICATION.md) for final verification results.

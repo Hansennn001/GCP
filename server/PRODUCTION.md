@@ -4,8 +4,8 @@ Express serves the API and the built React application from one origin. Vite
 is needed to build the frontend, but no Vite process is needed to serve it.
 Docker image build instructions are now in
 [CONTAINER_IMAGE.md](CONTAINER_IMAGE.md). Local Docker startup is documented in
-[LOCAL_DOCKER.md](../scripts/docker/LOCAL_DOCKER.md); Cloud Run belongs to a
-subsequent phase.
+[LOCAL_DOCKER.md](../scripts/docker/LOCAL_DOCKER.md); private Cloud Run deployment is documented in
+[CLOUD_RUN_DEPLOYMENT.md](../scripts/gcp/CLOUD_RUN_DEPLOYMENT.md).
 
 ## Run locally
 

@@ -138,7 +138,7 @@ Additional inline Node/Python checks verified:
 - Ctrl+C shutdown succeeded. The validation container and temporary ADC/config
   copies were confirmed removed. The reusable image remains available locally.
 
-This validates the local linux/arm64 image. The tested amd64 image is now published, as
-documented in [IMAGE_PUBLICATION.md](../gcp/IMAGE_PUBLICATION.md). Cloud Run
-deployment has not started. These results record Phase 16; completed GCP
-preparation is documented in [DEPLOYMENT_PREPARATION.md](../gcp/DEPLOYMENT_PREPARATION.md).
+These historical results validate the local linux/arm64 image. The tested amd64
+image is published as documented in [IMAGE_PUBLICATION.md](../gcp/IMAGE_PUBLICATION.md)
+and deployed to private Cloud Run. See [cloud deployment](../gcp/CLOUD_RUN_DEPLOYMENT.md)
+and [final verification](../gcp/FINAL_VERIFICATION.md) for the current release.

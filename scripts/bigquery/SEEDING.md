@@ -18,8 +18,8 @@ another project, dataset, or location. Run it only after Phase 4 setup.
 - Sales creators reference the demo admin or analyst IDs. The viewer
   does not create sales. Audit logs are not populated in this phase.
 
-The demo IDs are reserved for these fixtures. Frontend pages still use
-their Phase 2 mock data until API integration is implemented.
+The demo IDs are reserved for these fixtures. The frontend now reads application
+data through the Express API.
 
 ## Passwords
 
@@ -37,8 +37,7 @@ security find-generic-password -s sales-insight-dashboard-demo -a analyst@exampl
 security find-generic-password -s sales-insight-dashboard-demo -a viewer@example.com -w
 ```
 
-These are development/demo credentials. Application login endpoints are
-not implemented until Phase 6.
+These are development/demo credentials used by the implemented application login.
 
 ## Safe reruns
 
@@ -95,4 +94,6 @@ Do not put raw passwords in repository files.
 - Backend syntax checks, all 12 tests, BigQuery connectivity, and the live
   health endpoint passed.
 
-Phase 6 — Backend Authentication has not started.
+Historical seed results above precede application integration. The completed
+application and current data verification are documented in
+[FINAL_VERIFICATION.md](../gcp/FINAL_VERIFICATION.md).

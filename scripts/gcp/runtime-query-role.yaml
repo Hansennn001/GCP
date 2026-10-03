@@ -1,5 +1,0 @@
-title: Sales Insight Query Jobs
-description: Submit only the application's BigQuery query jobs in the target project.
-stage: GA
-includedPermissions:
-  - bigquery.jobs.create
